@@ -1,5 +1,5 @@
 package io.github.some_example_name;
-
+// Updated
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
