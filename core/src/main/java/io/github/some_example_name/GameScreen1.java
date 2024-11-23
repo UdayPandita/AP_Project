@@ -211,10 +211,10 @@ public class GameScreen1 implements Screen {
         Vector2 direction = slingStretch.cpy().sub(slingOrigin);  // Direction from slingshot origin
 
         // Generate a series of points to form the trajectory (like a dotted line)
-        int steps = 20; // Number of trajectory points
+        int steps = 15; // Number of trajectory points
 
         for (int i = 1; i <= steps; i++) {
-            float t = i / (float) steps;
+            float t = (i * (float) 1.5) / (float) steps;
             float x = slingOrigin.x + direction.x * t;
             float y = slingOrigin.y + direction.y * t;
             trajectoryPoints.add(new Vector2(x, y));
