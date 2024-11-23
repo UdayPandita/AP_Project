@@ -209,16 +209,19 @@ public class GameScreen1 implements Screen {
         CircleShape birdShape = new CircleShape();
         birdShape.setRadius(18 / 100f); // 18 pixels converted to Box2D units
 
+// Create Red Bird body at a reasonable height
         rdbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
-            80 / 100f, 102 / 100f, birdShape, 1f, 0.3f, 0.5f);
+            80 / 100f, 200 / 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (80px, 200px) in Box2D world
 
+// Create Black Bird body at a reasonable height
         blbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
-            2 / 100f, 102 / 100f, birdShape, 1f, 0.3f, 0.5f);
+            60/ 100f, 200 / 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (160px, 200px) in Box2D world
 
+// Create Purple Bird body at a reasonable height
         prbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
-            40 / 100f, 102 / 100f, birdShape, 1f, 0.3f, 0.5f);
+            40 / 100f, 200 / 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (240px, 200px) in Box2D world
 
-        birdShape.dispose(); // Dispose the shape after use
+        birdShape.dispose(); // Dispose the shape after useer use
 
         CircleShape pigShape = new CircleShape();
         pigShape.setRadius(19.5f / 100f); // 19.5 pixels converted to Box2D units
@@ -233,19 +236,18 @@ public class GameScreen1 implements Screen {
 
         BodyDef groundBodyDef = new BodyDef();
         groundBodyDef.type = BodyDef.BodyType.StaticBody;
-        groundBodyDef.position.set(800, 90); // Center X at 125, Y slightly below base
+        groundBodyDef.position.set(WORLD_WIDTH / 2 / 100f, 100/ 100f); // Positioned at the bottom center of the screen in Box2D units
 
-        // Create the body
+// Create the body
         Body groundBody = world.createBody(groundBodyDef);
 
-        // Define the shape of the ground
+// Define the shape of the ground
         PolygonShape groundShape = new PolygonShape();
-        groundShape.setAsBox(800, 1); // Adjust width and height
+        groundShape.setAsBox(WORLD_WIDTH / 2 / 100f, 1 / 100f); // Ground width spans the screen, height of 1 unit
 
-        // Attach the shape to the body
+// Attach the shape to the body
         groundBody.createFixture(groundShape, 0.0f);
         groundShape.dispose(); // Dispose the shape after creating the fixture
-
 
 
     }
@@ -286,24 +288,26 @@ public class GameScreen1 implements Screen {
 
     @Override
     public void render(float delta) {
+        // Clear screen and set up the camera
         Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         camera.update();
         batch.setProjectionMatrix(camera.combined);
-        batch.begin();
 
+        // Rendering the background and objects
+        batch.begin();
         batch.draw(bg, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
+        // Draw building elements and objects as usual
         batch.draw(steelblock.steelblock, 500, 102);
         batch.draw(steelblock.steelblock, 500, 137);
         batch.draw(steelblock.steelblock, 500, 169);
         batch.draw(steeltriangle.region, 500, 200);
         batch.draw(steelslab.region, 400, 100);
         batch.draw(steelslab.region, 400, 118);
-
         batch.draw(tnt, 500 + (float) (39 - 37) / 2 + 3, 135 + (float) (39 - 37) / 2 + 2, 39 * 0.8f, 37 * 0.8f);
 
+        // Draw pigs and birds in their correct positions
         if (armpig.body != null) {
             batch.draw(armpig.armourpig,
                 armpig.body.getPosition().x * 100 - 19.5f,
@@ -311,14 +315,12 @@ public class GameScreen1 implements Screen {
                 39, 39); // Sprite size
         }
 
-        // Regular Pig
         if (pig.body != null) {
             batch.draw(pig.pig,
                 pig.body.getPosition().x * 100 - 19.5f,
                 pig.body.getPosition().y * 100 - 19.5f,
                 39, 39); // Sprite size
         }
-
 
         // Draw slingshot (static position)
         batch.draw(slingshot, slingOrigin.x - 25, slingOrigin.y - 35, 50, 67);
@@ -328,8 +330,14 @@ public class GameScreen1 implements Screen {
                 rdbrd.body.getPosition().y * 100 - 18,
                 36, 36); // Sprite size
         }
+        // Draw birds in their correct positions
+        if (rdbrd.body != null) {
+            batch.draw(rdbrd.redbird,
+                rdbrd.body.getPosition().x * 100 - 18,
+                rdbrd.body.getPosition().y * 100 - 18,
+                36, 36); // Sprite size
+        }
 
-        // Blackbird
         if (blbrd.body != null) {
             batch.draw(blbrd.blackbird,
                 blbrd.body.getPosition().x * 100 - 18,
@@ -337,29 +345,31 @@ public class GameScreen1 implements Screen {
                 36, 36); // Sprite size
         }
 
-        // Purplebird
         if (prbrd.body != null) {
             batch.draw(prbrd.purplebird,
                 prbrd.body.getPosition().x * 100 - 18,
                 prbrd.body.getPosition().y * 100 - 18,
                 36, 36); // Sprite size
         }
+
         // Draw trajectory as a dotted line
         for (Vector2 point : trajectoryPoints) {
-
             batch.draw(dottexture, point.x + 5, point.y + 10, 3, 3);
-            // Small dot for trajectory
         }
 
         batch.end();
-        // Render Box2D debug shapes
-        debugRenderer.render(world, camera.combined);
+        debugRenderer.render(world, viewport.getCamera().combined);
 
-        // Update world simulation
+        // Render Box2D debug shapes (optional)
+
+        // Update the Box2D world step
         world.step(1 / 60f, 6, 2); // Fixed timestep
+
+        // Draw stage UI elements
         stage.act(delta);
         stage.draw();
     }
+
 
     @Override
     public void resize(int width, int height) {
