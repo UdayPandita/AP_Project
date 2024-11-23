@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
@@ -20,8 +21,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import Birds.*;
 import Pigs.*;
 import Elements.*;
-import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.math.Vector2;
 
 public class GameScreen1 implements Screen {
@@ -66,6 +65,8 @@ public class GameScreen1 implements Screen {
         ImageButton pauseButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(buttons, 408, 174, 118, 108)));
         TextButton dummyButton = new TextButton("Dummy", main.skin);
         trajectoryPoints = new Array<>();
+        world = new World(new Vector2(0, -9.8f), true); // Gravity pointing down
+        debugRenderer = new Box2DDebugRenderer();
         this.viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT);
         this.stage = new Stage(viewport, batch);
         Pixmap pixmap = new Pixmap(3, 3, Pixmap.Format.RGBA8888);  // Smaller dot size
@@ -97,6 +98,7 @@ public class GameScreen1 implements Screen {
             }
         });
     }
+
 
     @Override
     public void show() {
@@ -202,6 +204,67 @@ public class GameScreen1 implements Screen {
         table.top().right();
         table.add(dummyButton).pad(10).width(80);
         table.add(pauseButton).pad(10).width(80);
+
+        // Define and create Box2D bodies for the birds and pigs.
+        CircleShape birdShape = new CircleShape();
+        birdShape.setRadius(18 / 100f); // 18 pixels converted to Box2D units
+
+        rdbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
+            80 / 100f, 102 / 100f, birdShape, 1f, 0.3f, 0.5f);
+
+        blbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
+            2 / 100f, 102 / 100f, birdShape, 1f, 0.3f, 0.5f);
+
+        prbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
+            40 / 100f, 102 / 100f, birdShape, 1f, 0.3f, 0.5f);
+
+        birdShape.dispose(); // Dispose the shape after use
+
+        CircleShape pigShape = new CircleShape();
+        pigShape.setRadius(19.5f / 100f); // 19.5 pixels converted to Box2D units
+
+        armpig.body = createBody(world, BodyDef.BodyType.DynamicBody,
+            400 / 100f, 135 / 100f, pigShape, 1f, 0.3f, 0.5f);
+
+        pig.body = createBody(world, BodyDef.BodyType.DynamicBody,
+            500 / 100f, 167 / 100f, pigShape, 1f, 0.3f, 0.5f);
+
+        pigShape.dispose();
+
+        BodyDef groundBodyDef = new BodyDef();
+        groundBodyDef.type = BodyDef.BodyType.StaticBody;
+        groundBodyDef.position.set(800, 90); // Center X at 125, Y slightly below base
+
+        // Create the body
+        Body groundBody = world.createBody(groundBodyDef);
+
+        // Define the shape of the ground
+        PolygonShape groundShape = new PolygonShape();
+        groundShape.setAsBox(800, 1); // Adjust width and height
+
+        // Attach the shape to the body
+        groundBody.createFixture(groundShape, 0.0f);
+        groundShape.dispose(); // Dispose the shape after creating the fixture
+
+
+
+    }
+
+    private Body createBody(World world, BodyDef.BodyType bodyType, float x, float y,
+                            Shape shape, float density, float friction, float restitution) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = bodyType;
+        bodyDef.position.set(x, y);
+
+        Body body = world.createBody(bodyDef);
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.density = density;
+        fixtureDef.friction = friction;
+        fixtureDef.restitution = restitution; // Adjust this for bounciness
+
+        body.createFixture(fixtureDef);
+        return body;
     }
 
 
@@ -228,7 +291,6 @@ public class GameScreen1 implements Screen {
 
         camera.update();
         batch.setProjectionMatrix(camera.combined);
-
         batch.begin();
 
         batch.draw(bg, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -239,16 +301,49 @@ public class GameScreen1 implements Screen {
         batch.draw(steeltriangle.region, 500, 200);
         batch.draw(steelslab.region, 400, 100);
         batch.draw(steelslab.region, 400, 118);
-        batch.draw(armpig.armourpig, 400, 135, 39 * 0.9f, 35 * 0.9f);
 
         batch.draw(tnt, 500 + (float) (39 - 37) / 2 + 3, 135 + (float) (39 - 37) / 2 + 2, 39 * 0.8f, 37 * 0.8f);
-        batch.draw(pig.pig, 500 + (float) (39 - 37) / 2 + 3, 167 + (float) (39 - 37) / 2 + 5, 39 * 0.8f, 35 * 0.8f);
+
+        if (armpig.body != null) {
+            batch.draw(armpig.armourpig,
+                armpig.body.getPosition().x * 100 - 19.5f,
+                armpig.body.getPosition().y * 100 - 19.5f,
+                39, 39); // Sprite size
+        }
+
+        // Regular Pig
+        if (pig.body != null) {
+            batch.draw(pig.pig,
+                pig.body.getPosition().x * 100 - 19.5f,
+                pig.body.getPosition().y * 100 - 19.5f,
+                39, 39); // Sprite size
+        }
+
 
         // Draw slingshot (static position)
         batch.draw(slingshot, slingOrigin.x - 25, slingOrigin.y - 35, 50, 67);
-        batch.draw(rdbrd.redbird, 80, 102, 39, 37);
-        batch.draw(prbrd.purplebird, 40, 102, 39, 37);
-        batch.draw(blbrd.blackbird, 2, 102, 39, 37);
+        if (rdbrd.body != null) {
+            batch.draw(rdbrd.redbird,
+                rdbrd.body.getPosition().x * 100 - 18,
+                rdbrd.body.getPosition().y * 100 - 18,
+                36, 36); // Sprite size
+        }
+
+        // Blackbird
+        if (blbrd.body != null) {
+            batch.draw(blbrd.blackbird,
+                blbrd.body.getPosition().x * 100 - 18,
+                blbrd.body.getPosition().y * 100 - 18,
+                36, 36); // Sprite size
+        }
+
+        // Purplebird
+        if (prbrd.body != null) {
+            batch.draw(prbrd.purplebird,
+                prbrd.body.getPosition().x * 100 - 18,
+                prbrd.body.getPosition().y * 100 - 18,
+                36, 36); // Sprite size
+        }
         // Draw trajectory as a dotted line
         for (Vector2 point : trajectoryPoints) {
 
@@ -257,7 +352,11 @@ public class GameScreen1 implements Screen {
         }
 
         batch.end();
+        // Render Box2D debug shapes
+        debugRenderer.render(world, camera.combined);
 
+        // Update world simulation
+        world.step(1 / 60f, 6, 2); // Fixed timestep
         stage.act(delta);
         stage.draw();
     }
@@ -286,5 +385,7 @@ public class GameScreen1 implements Screen {
         textures2.dispose();
         slingshot.dispose();
         bird.dispose();
+        world.dispose(); // Dispose Box2D world
+        debugRenderer.dispose(); // D
     }
 }
