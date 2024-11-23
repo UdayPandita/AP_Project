@@ -72,7 +72,7 @@ public class GameScreen1 implements Screen {
         pixmap.setColor(1, 1, 1, 1);  // Set the color to white (or any color you want)
         pixmap.fillRectangle(0, 0, 3, 3);  // Fill the pixmap with a small white square
         dottexture = new Texture(pixmap);  // Create the texture from the pixmap
-        pixmap.dispose();  // Dispos
+        pixmap.dispose();
         Table table = new Table();
         table.setFillParent(true);
         stage.addActor(table);
@@ -249,11 +249,10 @@ public class GameScreen1 implements Screen {
         batch.draw(rdbrd.redbird, 80, 102, 39, 37);
         batch.draw(prbrd.purplebird, 40, 102, 39, 37);
         batch.draw(blbrd.blackbird, 2, 102, 39, 37);
-        float dotSpacing = 10f;
         // Draw trajectory as a dotted line
         for (Vector2 point : trajectoryPoints) {
 
-            batch.draw(dottexture, point.x, point.y, 3, 3);
+            batch.draw(dottexture, point.x + 5, point.y + 10, 3, 3);
             // Small dot for trajectory
         }
 
