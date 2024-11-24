@@ -52,8 +52,7 @@ public class GameScreen1 implements Screen {
     private Vector2 slingStretch = new Vector2(slingOrigin); // Stretching position
     private boolean dragging = false; // To check if dragging is happening
     private Array<Vector2> trajectoryPoints; // Array to store trajectory points for dotted line
-    private Array<Body> birds; // Array to store bird bodies
-    private int currentBirdIndex;
+
     public GameScreen1(final Main main) {
         this.main = main;
         this.batch = main.batch;
@@ -72,15 +71,13 @@ public class GameScreen1 implements Screen {
         ImageButton pauseButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(buttons, 408, 174, 118, 108)));
         TextButton dummyButton = new TextButton("Dummy", main.skin);
         trajectoryPoints = new Array<>();
-        world = new World(new Vector2(0, -9.8f), true); // Gravity pointing down
+        world = new World(new Vector2(0, -4.0f), true); // Gravity pointing down
         debugRenderer = new Box2DDebugRenderer(true, true, true, true, true, true);
         this.viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT);
         this.stage = new Stage(viewport, batch);
         Pixmap pixmap = new Pixmap(3, 3, Pixmap.Format.RGBA8888);  // Smaller dot size
         pixmap.setColor(1, 1, 1, 1);  // Set the color to white (or any color you want)
         pixmap.fillRectangle(0, 0, 3, 3);  // Fill the pixmap with a small white square
-        birds = new Array<>(); // Initialize the birds array
-        currentBirdIndex = 0; //
         dottexture = new Texture(pixmap);  // Create the texture from the pixmap
         pixmap.dispose();
         Table table = new Table();
@@ -152,42 +149,25 @@ public class GameScreen1 implements Screen {
             @Override
             public boolean touchUp(int screenX, int screenY, int pointer, int button) {
                 if (dragging) {
-                    dragging = false;
-                    // Calculate the launch direction and scale based on the drag distance
-                    Vector2 dragVector = slingOrigin.cpy().sub(slingStretch);
-                    float distance = dragVector.len(); // Get the length of the drag
+                    dragging = false; // Stop dragging the slingshot
 
-                    // Reduce max force and make scaling more gradual
-                    float forceScale = Math.min(distance / 100f, 1.5f); // Reduced max force from 2 to 1.5
+                    // Calculate the launch force
+                    Vector2 launchDirection = slingOrigin.cpy().sub(slingStretch); // Direction of launch
+                    float forceMultiplier = 12; // Adjust this value for force strength
+                    Vector2 launchForce = launchDirection.scl(forceMultiplier);
 
-                    // Reduce speed multiplier for slower motion
-                    float speedMultiplier = 0.15f;  // Reduced from 0.2 to 0.15
-
-                    Vector2 launchDirection = dragVector.scl(forceScale * speedMultiplier);
-
-                    if (currentBirdIndex < birds.size) {
-                        Body bird = birds.get(currentBirdIndex);
-                        bird.setTransform(slingOrigin.x / 100f, slingOrigin.y / 100f, 0);
-
-                        // Add linear damping to make motion smoother
-                        bird.setLinearDamping(0.2f); // Add slight damping
-
-                        // Apply velocity to launch the bird
-                        bird.setLinearVelocity(launchDirection);
-
-                        // Reduce angular velocity for smoother rotation
-                        bird.setAngularDamping(0.5f);
-
-                        bird.setActive(true);
-                        currentBirdIndex++;
+                    // Apply the force to the bird
+                    if (rdbrd.body != null && rdbrd.body.getLinearVelocity().isZero()) {
+                        rdbrd.body.setAwake(true); // Ensure the body is active
+                        rdbrd.body.applyForceToCenter(launchForce, true); // Apply the calculated force
                     }
-                    slingStretch.set(slingOrigin);
-                    trajectoryPoints.clear();
-                    return true;
-                }
-                return false;
-            }
 
+                    slingStretch.set(slingOrigin); // Reset the sling stretch position
+                    trajectoryPoints.clear(); // Clear the trajectory
+                    return true; // Consume the event to prevent it from reaching the stage
+                }
+                return false; // Allow the event to propagate to the next input processor (the stage)
+            }
 
         });
 
@@ -248,7 +228,7 @@ public class GameScreen1 implements Screen {
         CircleShape birdShape = new CircleShape();
         birdShape.setRadius(18 / 100f); // 18 pixels converted to Box2D units
 
-        // Create Red Bird body at a reasonable height
+// Create Red Bird body at a reasonable height
         rdbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
             80 / 100f, 120/ 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (80px, 200px) in Box2D world
 
@@ -259,10 +239,7 @@ public class GameScreen1 implements Screen {
 // Create Purple Bird body at a reasonable height
         prbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
             40 / 100f, 120 / 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (240px, 200px) in Box2D world
-// Create Red Bird body at a reasonable height
-        birds.add(rdbrd.body);
-        birds.add(blbrd.body);
-        birds.add(prbrd.body);
+
         birdShape.dispose(); // Dispose the shape after useer use
 
         CircleShape pigShape = new CircleShape();
@@ -432,29 +409,27 @@ public class GameScreen1 implements Screen {
         batch.draw(slingshot, slingOrigin.x - 25, slingOrigin.y - 35, 50, 67);
 
         // Draw birds in their correct positions
-        for (int i = 0; i < birds.size; i++) {
-            Body bird = birds.get(i);
-            if (bird != null) {
-                if(i==0){
-                    batch.draw(rdbrd.redbird,
-                        bird.getPosition().x * 100 - 18,
-                        bird.getPosition().y * 100 - 18,
-                        36, 36);
-                }
-                if(i==1){
-                    batch.draw(blbrd.blackbird,
-                        bird.getPosition().x * 100 - 18,
-                        bird.getPosition().y * 100 - 18,
-                        36, 36);
-                }
-                if(i==2){
-                    batch.draw(prbrd.purplebird,
-                        bird.getPosition().x * 100 - 18,
-                        bird.getPosition().y * 100 - 18,
-                        36, 36);
-                }
-            }
+        if (rdbrd.body != null) {
+            batch.draw(rdbrd.redbird,
+                rdbrd.body.getPosition().x * 100 -18,
+                rdbrd.body.getPosition().y * 100 - 18,
+                36, 36); // Sprite size
         }
+
+        if (blbrd.body != null) {
+            batch.draw(blbrd.blackbird,
+                blbrd.body.getPosition().x * 100 - 18,
+                blbrd.body.getPosition().y * 100 - 18,
+                36, 36); // Sprite size
+        }
+
+        if (prbrd.body != null) {
+            batch.draw(prbrd.purplebird,
+                prbrd.body.getPosition().x * 100 - 18,
+                prbrd.body.getPosition().y * 100 - 18,
+                36, 36); // Sprite size
+        }
+
         // Draw trajectory as a dotted line
         for (Vector2 point : trajectoryPoints) {
             batch.draw(dottexture, point.x + 5, point.y + 10, 3, 3);
