@@ -170,9 +170,9 @@ public class GameScreen3 implements Screen {
         batch.draw(slingshot, 138, 63, 50, 67);
         batch.draw(brd, 88, 63, 34, 36);
 
-        batch.draw(prbrd.purplebird, 50, 63, 32, 34);
-        batch.draw(blbrd.blackbird, 125, 63, 42, 44);
-        batch.draw(rdbrd.redbird, 16, 63, 34, 36);
+        batch.draw(prbrd.textureregion, 50, 63, 32, 34);
+        batch.draw(blbrd.textureregion, 125, 63, 42, 44);
+        batch.draw(rdbrd.textureregion, 16, 63, 34, 36);
         batch.end();
 
         stage.act(delta);

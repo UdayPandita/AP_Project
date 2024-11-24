@@ -410,21 +410,21 @@ public class GameScreen1 implements Screen {
 
         // Draw birds in their correct positions
         if (rdbrd.body != null) {
-            batch.draw(rdbrd.redbird,
+            batch.draw(rdbrd.textureregion,
                 rdbrd.body.getPosition().x * 100 -18,
                 rdbrd.body.getPosition().y * 100 - 18,
                 36, 36); // Sprite size
         }
 
         if (blbrd.body != null) {
-            batch.draw(blbrd.blackbird,
+            batch.draw(blbrd.textureregion,
                 blbrd.body.getPosition().x * 100 - 18,
                 blbrd.body.getPosition().y * 100 - 18,
                 36, 36); // Sprite size
         }
 
         if (prbrd.body != null) {
-            batch.draw(prbrd.purplebird,
+            batch.draw(prbrd.textureregion,
                 prbrd.body.getPosition().x * 100 - 18,
                 prbrd.body.getPosition().y * 100 - 18,
                 36, 36); // Sprite size
