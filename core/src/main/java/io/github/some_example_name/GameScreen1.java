@@ -41,15 +41,19 @@ public class GameScreen1 implements Screen {
     Armourpig armpig;
     Pig pig;
     Steelblock steelblock;
+    Steelblock steelblock2;
+    Steelblock steelblock3;
     SteelTriangle steeltriangle;
     Steelslab steelslab;
+    Steelslab steelslab2;
     private World world;
     private Box2DDebugRenderer debugRenderer;
     private Vector2 slingOrigin = new Vector2(125, 130); // Slingshot origin position
     private Vector2 slingStretch = new Vector2(slingOrigin); // Stretching position
     private boolean dragging = false; // To check if dragging is happening
     private Array<Vector2> trajectoryPoints; // Array to store trajectory points for dotted line
-
+    private Array<Body> birds; // Array to store bird bodies
+    private int currentBirdIndex;
     public GameScreen1(final Main main) {
         this.main = main;
         this.batch = main.batch;
@@ -60,18 +64,23 @@ public class GameScreen1 implements Screen {
         armpig = new Armourpig();
         pig = new Pig();
         steelblock = new Steelblock();
+        steelblock2 = new Steelblock();
+        steelblock3 = new Steelblock();
         steelslab = new Steelslab();
+        steelslab2 = new Steelslab();
         steeltriangle = new SteelTriangle();
         ImageButton pauseButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(buttons, 408, 174, 118, 108)));
         TextButton dummyButton = new TextButton("Dummy", main.skin);
         trajectoryPoints = new Array<>();
         world = new World(new Vector2(0, -9.8f), true); // Gravity pointing down
-        debugRenderer = new Box2DDebugRenderer();
+        debugRenderer = new Box2DDebugRenderer(true, true, true, true, true, true);
         this.viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT);
         this.stage = new Stage(viewport, batch);
         Pixmap pixmap = new Pixmap(3, 3, Pixmap.Format.RGBA8888);  // Smaller dot size
         pixmap.setColor(1, 1, 1, 1);  // Set the color to white (or any color you want)
         pixmap.fillRectangle(0, 0, 3, 3);  // Fill the pixmap with a small white square
+        birds = new Array<>(); // Initialize the birds array
+        currentBirdIndex = 0; //
         dottexture = new Texture(pixmap);  // Create the texture from the pixmap
         pixmap.dispose();
         Table table = new Table();
@@ -143,13 +152,33 @@ public class GameScreen1 implements Screen {
             @Override
             public boolean touchUp(int screenX, int screenY, int pointer, int button) {
                 if (dragging) {
-                    dragging = false; // Stop dragging the slingshot
-                    slingStretch.set(slingOrigin); // Reset the sling stretch position
-                    trajectoryPoints.clear(); // Clear the trajectory
-                    return true;  // Consume the event to prevent it from reaching the stage
+                    dragging = false;
+                    // Calculate the launch direction and scale based on the drag distance
+                    Vector2 dragVector = slingOrigin.cpy().sub(slingStretch);
+                    float distance = dragVector.len(); // Get the length of the drag
+                    float forceScale = Math.min(distance / 100f, 2f); // Scale force based on drag, limit max force to 2
+
+                    // Apply a speed reduction multiplier
+                    float speedMultiplier = 0.5f;  // This scales the speed down to half (adjust as needed)
+                    Vector2 launchDirection = dragVector.scl(forceScale * speedMultiplier); // Apply scaling to the launch vector
+
+                    // Apply the velocity to the bird
+                    if (currentBirdIndex < birds.size) {
+                        Body bird = birds.get(currentBirdIndex); // Get the current bird
+                        bird.setTransform(slingOrigin.x / 100f, slingOrigin.y / 100f, 0); // Set bird position
+                        bird.setLinearVelocity(launchDirection); // Apply velocity to launch the bird
+                        bird.setActive(true); // Activate the bird in the world
+                        currentBirdIndex++; // Move to the next bird
+                    }
+
+                    slingStretch.set(slingOrigin);
+                    trajectoryPoints.clear();
+                    return true;
                 }
-                return false;  // Allow the event to propagate to the next input processor (the stage)
+                return false;
             }
+
+
         });
 
         // Add the stage as the second processor (UI interaction should be handled after the dragging logic)
@@ -209,30 +238,70 @@ public class GameScreen1 implements Screen {
         CircleShape birdShape = new CircleShape();
         birdShape.setRadius(18 / 100f); // 18 pixels converted to Box2D units
 
-// Create Red Bird body at a reasonable height
+        // Create Red Bird body at a reasonable height
         rdbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
-            80 / 100f, 200 / 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (80px, 200px) in Box2D world
+            80 / 100f, 120/ 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (80px, 200px) in Box2D world
 
 // Create Black Bird body at a reasonable height
         blbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
-            60/ 100f, 200 / 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (160px, 200px) in Box2D world
+            60/ 100f, 120 / 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (160px, 200px) in Box2D world
 
 // Create Purple Bird body at a reasonable height
         prbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
-            40 / 100f, 200 / 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (240px, 200px) in Box2D world
-
+            40 / 100f, 120 / 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (240px, 200px) in Box2D world
+// Create Red Bird body at a reasonable height
+        birds.add(rdbrd.body);
+        birds.add(blbrd.body);
+        birds.add(prbrd.body);
         birdShape.dispose(); // Dispose the shape after useer use
 
         CircleShape pigShape = new CircleShape();
         pigShape.setRadius(19.5f / 100f); // 19.5 pixels converted to Box2D units
 
+
+
         armpig.body = createBody(world, BodyDef.BodyType.DynamicBody,
-            400 / 100f, 135 / 100f, pigShape, 1f, 0.3f, 0.5f);
+            400 / 100f, 135 / 100f, pigShape, 1f, 5.0f, 0.5f);
+        armpig.body.setLinearDamping(2.0f); // Add damping to reduce sliding
+
 
         pig.body = createBody(world, BodyDef.BodyType.DynamicBody,
-            500 / 100f, 167 / 100f, pigShape, 1f, 0.3f, 0.5f);
-
+            520 / 100f, 120 / 100f, pigShape, 1f, 1.5f, 0.5f);
+       pig.body.setLinearDamping(2.0f);
         pigShape.dispose();
+
+        PolygonShape steelblockShape = new PolygonShape();
+        steelblockShape.setAsBox(18 / 100f, 18 / 100f); // S
+        steelblock.body = createBody(world, BodyDef.BodyType.DynamicBody,
+            500 / 100f, 102 / 100f, steelblockShape, 5f, 0.5f, 0.2f);
+
+        steelblock2.body = createBody(world, BodyDef.BodyType.DynamicBody,
+            500 / 100f, 137 / 100f, steelblockShape, 5f, 0.5f, 0.2f);
+
+        steelblock3.body = createBody(world, BodyDef.BodyType.DynamicBody,
+            500 / 100f, 169 / 100f, steelblockShape, 5f, 0.5f, 0.2f);
+        PolygonShape steelslabShape = new PolygonShape();
+        steelslabShape.setAsBox(37 / 100f, 9 / 100f);
+        steelslab.body = createBody(world, BodyDef.BodyType.DynamicBody,
+            400 / 100f, 100 / 100f, steelslabShape, 5f, 0.8f, 0.0f);
+
+        steelslab2.body = createBody(world, BodyDef.BodyType.DynamicBody,
+            400 / 100f, 118 / 100f, steelslabShape, 5f, 0.8f, 0.0f);
+        PolygonShape steeltriangleShape = new PolygonShape();
+        steeltriangleShape.set(new Vector2[]{
+            new Vector2(-18 / 100f, -18 / 100f),
+            new Vector2(18 / 100f, -18 / 100f),
+            new Vector2(0, 18 / 100f)
+        }); // Triangle size matches sprite (36x36 pixels)
+
+// Create a dynamic body for the steeltriangle
+        steeltriangle.body = createBody(world, BodyDef.BodyType.DynamicBody,
+            500 / 100f, 200 / 100f, steeltriangleShape, 5f, 0.9f, 0.2f);
+
+        steelblockShape.dispose();
+        steeltriangleShape.dispose();
+        steelslabShape.dispose();
+
 
         BodyDef groundBodyDef = new BodyDef();
         groundBodyDef.type = BodyDef.BodyType.StaticBody;
@@ -244,9 +313,13 @@ public class GameScreen1 implements Screen {
 // Define the shape of the ground
         PolygonShape groundShape = new PolygonShape();
         groundShape.setAsBox(WORLD_WIDTH / 2 / 100f, 1 / 100f); // Ground width spans the screen, height of 1 unit
+        FixtureDef groundFixtureDef = new FixtureDef();
+        groundFixtureDef.shape = groundShape;
+        groundFixtureDef.friction = 1.5f; // Increase friction for ground
+        groundFixtureDef.restitution = 0.0f; // Ensure no bounce
 
 // Attach the shape to the body
-        groundBody.createFixture(groundShape, 0.0f);
+        groundBody.createFixture(groundFixtureDef);
         groundShape.dispose(); // Dispose the shape after creating the fixture
 
 
@@ -299,13 +372,36 @@ public class GameScreen1 implements Screen {
         batch.draw(bg, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
         // Draw building elements and objects as usual
-        batch.draw(steelblock.steelblock, 500, 102);
-        batch.draw(steelblock.steelblock, 500, 137);
-        batch.draw(steelblock.steelblock, 500, 169);
-        batch.draw(steeltriangle.region, 500, 200);
-        batch.draw(steelslab.region, 400, 100);
-        batch.draw(steelslab.region, 400, 118);
-        batch.draw(tnt, 500 + (float) (39 - 37) / 2 + 3, 135 + (float) (39 - 37) / 2 + 2, 39 * 0.8f, 37 * 0.8f);
+        batch.draw(steelblock.steelblock,
+            steelblock.body.getPosition().x * 100 - 18,
+            steelblock.body.getPosition().y * 100 - 18,
+            36, 36);
+
+        batch.draw(steelblock2.steelblock,
+            steelblock2.body.getPosition().x * 100 - 18,
+            steelblock2.body.getPosition().y * 100 - 18,
+            36, 36);
+
+        batch.draw(steelblock3.steelblock,
+            steelblock3.body.getPosition().x * 100 - 18,
+            steelblock3.body.getPosition().y * 100 - 18,
+            36, 36);
+
+        if (steeltriangle.body != null) {
+            batch.draw(steeltriangle.region,
+                steeltriangle.body.getPosition().x * 100 - 18,
+                steeltriangle.body.getPosition().y * 100 - 18,
+                36, 36); // Sprite size
+        }
+        batch.draw(steelslab.region,
+            steelslab.body.getPosition().x * 100 - 37,
+            steelslab.body.getPosition().y * 100 - 9,
+            74, 18);
+
+        batch.draw(steelslab2.region,
+            steelslab2.body.getPosition().x * 100 - 37,
+            steelslab2.body.getPosition().y * 100 - 9,
+            74, 18);
 
         // Draw pigs and birds in their correct positions
         if (armpig.body != null) {
@@ -324,41 +420,38 @@ public class GameScreen1 implements Screen {
 
         // Draw slingshot (static position)
         batch.draw(slingshot, slingOrigin.x - 25, slingOrigin.y - 35, 50, 67);
-        if (rdbrd.body != null) {
-            batch.draw(rdbrd.redbird,
-                rdbrd.body.getPosition().x * 100 - 18,
-                rdbrd.body.getPosition().y * 100 - 18,
-                36, 36); // Sprite size
-        }
+
         // Draw birds in their correct positions
-        if (rdbrd.body != null) {
-            batch.draw(rdbrd.redbird,
-                rdbrd.body.getPosition().x * 100 - 18,
-                rdbrd.body.getPosition().y * 100 - 18,
-                36, 36); // Sprite size
+        for (int i = 0; i < birds.size; i++) {
+            Body bird = birds.get(i);
+            if (bird != null) {
+                if(i==0){
+                batch.draw(rdbrd.redbird,
+                    bird.getPosition().x * 100 - 18,
+                    bird.getPosition().y * 100 - 18,
+                    36, 36);
+            }
+                if(i==1){
+                    batch.draw(blbrd.blackbird,
+                        bird.getPosition().x * 100 - 18,
+                        bird.getPosition().y * 100 - 18,
+                        36, 36);
+                }
+                if(i==2){
+                    batch.draw(prbrd.purplebird,
+                        bird.getPosition().x * 100 - 18,
+                        bird.getPosition().y * 100 - 18,
+                        36, 36);
+                }
+            }
         }
-
-        if (blbrd.body != null) {
-            batch.draw(blbrd.blackbird,
-                blbrd.body.getPosition().x * 100 - 18,
-                blbrd.body.getPosition().y * 100 - 18,
-                36, 36); // Sprite size
-        }
-
-        if (prbrd.body != null) {
-            batch.draw(prbrd.purplebird,
-                prbrd.body.getPosition().x * 100 - 18,
-                prbrd.body.getPosition().y * 100 - 18,
-                36, 36); // Sprite size
-        }
-
         // Draw trajectory as a dotted line
         for (Vector2 point : trajectoryPoints) {
             batch.draw(dottexture, point.x + 5, point.y + 10, 3, 3);
         }
 
         batch.end();
-        debugRenderer.render(world, viewport.getCamera().combined);
+        debugRenderer.render(world, camera.combined.cpy().scl(100)); // Adjust scaling factor for world-to-pixel conversion
 
         // Render Box2D debug shapes (optional)
 
@@ -384,8 +477,14 @@ public class GameScreen1 implements Screen {
     public void resume() {}
 
     @Override
-    public void hide() {}
-
+    public void hide() {
+        // Clean up Box2D world by destroying all bodies
+        Array<Body> bodies = new Array<>();
+        world.getBodies(bodies); // Retrieve all bodies from the world
+        for (Body body : bodies) {
+            world.destroyBody(body);
+        }
+    }
     @Override
     public void dispose() {
         stage.dispose();
