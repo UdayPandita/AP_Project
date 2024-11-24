@@ -1,121 +1,101 @@
 package io.github.some_example_name;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-
+import Birds.*;
+import Pigs.*;
+import Elements.*;
 public class GameScreen2 implements Screen {
-    private final Main main;
     private static final float WORLD_WIDTH = 800;
     private static final float WORLD_HEIGHT = 480;
+    Texture buttons;
     private final Stage stage;
     private final SpriteBatch batch;
-    private Texture bg, textures, bird;
-    private TextureRegion brd, steelBlockRegion;
+    private Texture bg, tnt, textures, textures2, slingshot, bird;
+    private TextureRegion region, brd;
     private OrthographicCamera camera;
     private final Viewport viewport;
-    private Texture dottexture;
-    private World world;
-    private Box2DDebugRenderer debugRenderer;
-    private Vector2 slingOrigin = new Vector2(100, 150); // Slingshot origin
-    private Vector2 slingStretch = new Vector2(slingOrigin);
-    private boolean dragging = false;
-    private Array<Vector2> trajectoryPoints;
-
+    Redbird rdbrd;
+    Blackbird blbrd;
+    PurpleBird prbrd;
+    Armourpig armpig;
+    Kingpig kngpig;
+    Chiefpig chfpig;
+    Steelblock steelblock;
     public GameScreen2(final Main main) {
-        this.main = main;
         this.batch = main.batch;
+        buttons = new Texture("buttons.png");
+        rdbrd = new Redbird();
+        blbrd = new Blackbird();
+        prbrd = new PurpleBird();
+        armpig = new Armourpig();
+        kngpig = new Kingpig();
+        chfpig = new Chiefpig();
+        steelblock = new Steelblock();
+        ImageButton pauseButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(buttons, 408, 174, 118, 108)));
+        TextButton dummyButton=new TextButton("Dummy", main.skin);
 
-        // Initialize Box2D world
-        world = new World(new Vector2(0, -9.8f), true);
-        debugRenderer = new Box2DDebugRenderer();
-
-        // Initialize viewport and camera
         this.viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT);
-        camera = (OrthographicCamera) viewport.getCamera();
-        camera.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
-        camera.update();
-
-        // Initialize stage
         this.stage = new Stage(viewport, batch);
 
-        // Load textures
-        bg = new Texture("background2.png");
-        textures = new Texture("buildingelements.png");
-        bird = new Texture("birds.png");
+        Table table = new Table();
+        table.setFillParent(true);
+        stage.addActor(table);
 
-        // Define regions
-        brd = new TextureRegion(bird, 929, 888, 72, 69);
-        steelBlockRegion = new TextureRegion(textures, 1, 2, 37, 37);
+        table.top().right();
+        table.add(dummyButton).pad(10).width(80);
+        table.add(pauseButton).pad(10).width(80);
 
-        // Dot texture for trajectory
-        Pixmap pixmap = new Pixmap(3, 3, Pixmap.Format.RGBA8888);
-        pixmap.setColor(1, 1, 1, 1); // White dots
-        pixmap.fillRectangle(0, 0, 3, 3);
-        dottexture = new Texture(pixmap);
-        pixmap.dispose();
+        pauseButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Gdx.app.log("GameScreen", "Pause button clicked");
+                main.pause.previousScreen = main.game2;
+                main.setScreen(main.pause);
+            }
+        });
+        dummyButton.addListener(new ChangeListener(){
+            public void changed(ChangeEvent event, Actor actor) {
+                Gdx.app.log("GameScreen", "Dummy button clicked");
+                main.wscreen.previousScreen = main.game2;
+                main.setScreen(main.wscreen);
 
-        // Initialize trajectory points
-        trajectoryPoints = new Array<>();
+            }
+
+        });
     }
 
     @Override
     public void show() {
-        InputMultiplexer multiplexer = new InputMultiplexer();
-        multiplexer.addProcessor(stage);
+        Gdx.input.setInputProcessor(stage);
 
-        // Custom InputAdapter for dragging slingshot
-        multiplexer.addProcessor(new InputAdapter() {
-            @Override
-            public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-                Vector2 touchPos = viewport.unproject(new Vector2(screenX, screenY));
-                if (touchPos.dst(slingOrigin) <= 50) {
-                    dragging = true;
-                    return true;
-                }
-                return false;
-            }
+        bg = new Texture(Gdx.files.internal("background2.png"));
+        tnt = new Texture(Gdx.files.internal("TNT.png"));
+        textures = new Texture(Gdx.files.internal("buildingelements.png"));
+        textures2 = new Texture(Gdx.files.internal("character.png"));
+        slingshot = new Texture(Gdx.files.internal("slingshot.png"));
+        bird = new Texture(Gdx.files.internal("birds.png"));
 
-            @Override
-            public boolean touchDragged(int screenX, int screenY, int pointer) {
-                if (dragging) {
-                    Vector2 touchPos = viewport.unproject(new Vector2(screenX, screenY));
-                    slingStretch.set(touchPos);
-                    if (slingStretch.dst(slingOrigin) > 75) {
-                        slingStretch.set(slingOrigin).add(touchPos.sub(slingOrigin).nor().scl(75));
-                    }
-                    updateTrajectory();
-                    return true;
-                }
-                return false;
-            }
+        region = new TextureRegion(textures, 1, 2, 37, 37);
+        brd = new TextureRegion(bird, 929, 888, 72, 69);
 
-            @Override
-            public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-                if (dragging) {
-                    dragging = false;
-                    slingStretch.set(slingOrigin);
-                    trajectoryPoints.clear();
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        Gdx.input.setInputProcessor(multiplexer);
+        camera = (OrthographicCamera) viewport.getCamera();
+        camera.position.set(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 0);
+        camera.update();
     }
 
     @Override
@@ -125,50 +105,40 @@ public class GameScreen2 implements Screen {
 
         camera.update();
         batch.setProjectionMatrix(camera.combined);
+
         batch.begin();
 
-        // Draw background
         batch.draw(bg, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
-        // Draw slingshot and bird
-        batch.draw(brd, slingStretch.x - 36, slingStretch.y - 34, 72, 69);
+        batch.draw(steelblock.steelblock, 500, 152);
+        batch.draw(steelblock.steelblock,520,189);
+        batch.draw(steelblock.steelblock,540,226);
+        batch.draw(steelblock.steelblock,578,226);
+        batch.draw(steelblock.steelblock,602,189);
+        batch.draw(steelblock.steelblock, 620, 152);
+        batch.draw(chfpig.chiefpig,538,152,39,37);
+        batch.draw(armpig.armourpig,578,152,39,37);
+        batch.draw(kngpig.kingpig,555,260,50,52);
 
-        // Draw trajectory points
-        for (Vector2 point : trajectoryPoints) {
-            batch.draw(dottexture, point.x - 1.5f, point.y - 1.5f, 3, 3);
-        }
+        batch.draw(tnt,540 + (float) (39 - 37) / 2 + 3,224+ (float) (39 - 37) / 2 + 4, 39 * 0.8f, 37 * 0.8f);
+        batch.draw(tnt,578 + (float) (39 - 37) / 2 + 3,224+ (float) (39 - 37) / 2 + 4, 39 * 0.8f, 37 * 0.8f);
 
-        // Example block (static object)
-        batch.draw(steelBlockRegion, 400, 150, 37, 37);
+        batch.draw(slingshot, 130, 152, 50, 67);
+        batch.draw(rdbrd.textureregion, 100, 152, 42, 44);
+
+        batch.draw(prbrd.textureregion, 44, 152, 42, 44);
+        batch.draw(blbrd.textureregion, 2, 152, 42, 44);
 
         batch.end();
 
-        // Render Box2D debug shapes
-        debugRenderer.render(world, camera.combined);
-
-        // Step Box2D world
-        world.step(1 / 60f, 6, 2);
         stage.act(delta);
         stage.draw();
     }
 
-    private void updateTrajectory() {
-        trajectoryPoints.clear();
-        Vector2 direction = slingStretch.cpy().sub(slingOrigin);
-        int steps = 15;
-
-        for (int i = 1; i <= steps; i++) {
-            float t = i * 0.2f; // Adjust step size for better visualization
-            float x = slingOrigin.x + direction.x * t;
-            float y = slingOrigin.y + direction.y * t - (0.5f * 9.8f * t * t);
-            trajectoryPoints.add(new Vector2(x, y));
-        }
-    }
-
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height);
-        stage.getViewport().update(width, height);
+        viewport.update(width, height, true);
+        stage.getViewport().update(width, height, true);
     }
 
     @Override
@@ -184,10 +154,10 @@ public class GameScreen2 implements Screen {
     public void dispose() {
         stage.dispose();
         bg.dispose();
-        bird.dispose();
+        tnt.dispose();
         textures.dispose();
-        world.dispose();
-        debugRenderer.dispose();
-        dottexture.dispose();
+        textures2.dispose();
+        slingshot.dispose();
+        bird.dispose();
     }
 }
