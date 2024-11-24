@@ -156,21 +156,31 @@ public class GameScreen1 implements Screen {
                     // Calculate the launch direction and scale based on the drag distance
                     Vector2 dragVector = slingOrigin.cpy().sub(slingStretch);
                     float distance = dragVector.len(); // Get the length of the drag
-                    float forceScale = Math.min(distance / 100f, 2f); // Scale force based on drag, limit max force to 2
 
-                    // Apply a speed reduction multiplier
-                    float speedMultiplier = 0.5f;  // This scales the speed down to half (adjust as needed)
-                    Vector2 launchDirection = dragVector.scl(forceScale * speedMultiplier); // Apply scaling to the launch vector
+                    // Reduce max force and make scaling more gradual
+                    float forceScale = Math.min(distance / 100f, 1.5f); // Reduced max force from 2 to 1.5
 
-                    // Apply the velocity to the bird
+                    // Reduce speed multiplier for slower motion
+                    float speedMultiplier = 0.15f;  // Reduced from 0.2 to 0.15
+
+                    Vector2 launchDirection = dragVector.scl(forceScale * speedMultiplier);
+
                     if (currentBirdIndex < birds.size) {
-                        Body bird = birds.get(currentBirdIndex); // Get the current bird
-                        bird.setTransform(slingOrigin.x / 100f, slingOrigin.y / 100f, 0); // Set bird position
-                        bird.setLinearVelocity(launchDirection); // Apply velocity to launch the bird
-                        bird.setActive(true); // Activate the bird in the world
-                        currentBirdIndex++; // Move to the next bird
-                    }
+                        Body bird = birds.get(currentBirdIndex);
+                        bird.setTransform(slingOrigin.x / 100f, slingOrigin.y / 100f, 0);
 
+                        // Add linear damping to make motion smoother
+                        bird.setLinearDamping(0.2f); // Add slight damping
+
+                        // Apply velocity to launch the bird
+                        bird.setLinearVelocity(launchDirection);
+
+                        // Reduce angular velocity for smoother rotation
+                        bird.setAngularDamping(0.5f);
+
+                        bird.setActive(true);
+                        currentBirdIndex++;
+                    }
                     slingStretch.set(slingOrigin);
                     trajectoryPoints.clear();
                     return true;
@@ -267,7 +277,7 @@ public class GameScreen1 implements Screen {
 
         pig.body = createBody(world, BodyDef.BodyType.DynamicBody,
             520 / 100f, 120 / 100f, pigShape, 1f, 1.5f, 0.5f);
-       pig.body.setLinearDamping(2.0f);
+        pig.body.setLinearDamping(2.0f);
         pigShape.dispose();
 
         PolygonShape steelblockShape = new PolygonShape();
@@ -426,11 +436,11 @@ public class GameScreen1 implements Screen {
             Body bird = birds.get(i);
             if (bird != null) {
                 if(i==0){
-                batch.draw(rdbrd.redbird,
-                    bird.getPosition().x * 100 - 18,
-                    bird.getPosition().y * 100 - 18,
-                    36, 36);
-            }
+                    batch.draw(rdbrd.redbird,
+                        bird.getPosition().x * 100 - 18,
+                        bird.getPosition().y * 100 - 18,
+                        36, 36);
+                }
                 if(i==1){
                     batch.draw(blbrd.blackbird,
                         bird.getPosition().x * 100 - 18,
