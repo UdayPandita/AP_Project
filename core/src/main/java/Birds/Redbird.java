@@ -9,6 +9,6 @@ public class Redbird extends Bird {
         texture = new Texture("birds.png");
         textureregion = new TextureRegion(texture,929, 888, 72, 69);
         health = 10;
-        attack=10;
+        attack=13;
     }
 }

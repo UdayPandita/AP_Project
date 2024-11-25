@@ -1,13 +1,13 @@
 package Pigs;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-public class Minipig {
-    public Texture pg;
-    public TextureRegion minipig;
+public class Minipig extends Pig {
+    public Texture texture;
+    public TextureRegion textureregion;
     public int health;
     public Minipig() {
-        pg = new Texture("pig.png");
-        minipig = new TextureRegion(pg,57, 509, 24, 23);
+        texture = new Texture("pig.png");
+        textureregion = new TextureRegion(texture,57, 509, 24, 23);
         health = 2;
     }
 }

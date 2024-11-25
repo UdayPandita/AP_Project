@@ -23,6 +23,9 @@ import Pigs.*;
 import Elements.*;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 public class GameScreen1 implements Screen {
     private final Main main;
     private static final float WORLD_WIDTH = 800;
@@ -54,6 +57,9 @@ public class GameScreen1 implements Screen {
     private Array<Vector2> trajectoryPoints; // Array to store trajectory points for dotted line
     private Array<Body> birds; // Array to store bird bodies
     private int currentBirdIndex;
+    private Array<Pigs> Pig;
+    private Array<Structure> Structure;
+    private  Array<Body> bodiesToDestroy;
     public GameScreen1(final Main main) {
         this.main = main;
         this.batch = main.batch;
@@ -80,8 +86,13 @@ public class GameScreen1 implements Screen {
         pixmap.setColor(1, 1, 1, 1);  // Set the color to white (or any color you want)
         pixmap.fillRectangle(0, 0, 3, 3);  // Fill the pixmap with a small white square
         birds = new Array<>(); // Initialize the birds array
+        Pig = new Array<>();
+        Structure = new Array<>();
         currentBirdIndex = 0; //
-        dottexture = new Texture(pixmap);  // Create the texture from the pixmap
+        dottexture = new Texture(pixmap);
+        bodiesToDestroy = new Array<>();
+
+        // Create the texture from the pixmap
         pixmap.dispose();
         Table table = new Table();
         table.setFillParent(true);
@@ -95,6 +106,7 @@ public class GameScreen1 implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.app.log("GameScreen", "Pause button clicked");
+                False();
                 main.pause.previousScreen = main.game1;
                 main.setScreen(main.pause);
             }
@@ -102,6 +114,7 @@ public class GameScreen1 implements Screen {
         dummyButton.addListener(new ChangeListener() {
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.app.log("GameScreen", "Dummy button clicked");
+                False();
                 main.wscreen.previousScreen = main.game1;
                 main.setScreen(main.wscreen);
             }
@@ -249,10 +262,11 @@ public class GameScreen1 implements Screen {
 // Create Purple Bird body at a reasonable height
         prbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
             40 / 100f, 120 / 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (240px, 200px) in Box2D world
-// Create Red Bird body at a reasonable height
+
         birds.add(rdbrd.body);
         birds.add(blbrd.body);
         birds.add(prbrd.body);
+
         birdShape.dispose(); // Dispose the shape after useer use
 
         CircleShape pigShape = new CircleShape();
@@ -270,16 +284,17 @@ public class GameScreen1 implements Screen {
         pig.body.setLinearDamping(2.0f);
         pigShape.dispose();
 
+
         PolygonShape steelblockShape = new PolygonShape();
         steelblockShape.setAsBox(18 / 100f, 18 / 100f); // S
         steelblock.body = createBody(world, BodyDef.BodyType.DynamicBody,
-            500 / 100f, 102 / 100f, steelblockShape, 5f, 0.5f, 0.2f);
+            500 / 100f, 102 / 100f, steelblockShape, 2.5f, 0.5f, 0.2f);
 
         steelblock2.body = createBody(world, BodyDef.BodyType.DynamicBody,
-            500 / 100f, 137 / 100f, steelblockShape, 5f, 0.5f, 0.2f);
+            500 / 100f, 137 / 100f, steelblockShape, 2.5f, 0.5f, 0.2f);
 
         steelblock3.body = createBody(world, BodyDef.BodyType.DynamicBody,
-            500 / 100f, 169 / 100f, steelblockShape, 5f, 0.5f, 0.2f);
+            500 / 100f, 169 / 100f, steelblockShape, 2.5f, 0.5f, 0.2f);
         PolygonShape steelslabShape = new PolygonShape();
         steelslabShape.setAsBox(37 / 100f, 9 / 100f);
         steelslab.body = createBody(world, BodyDef.BodyType.DynamicBody,
@@ -301,8 +316,18 @@ public class GameScreen1 implements Screen {
         steelblockShape.dispose();
         steeltriangleShape.dispose();
         steelslabShape.dispose();
+        rdbrd.body.setUserData(rdbrd);
+        prbrd.body.setUserData(prbrd);
+        blbrd.body.setUserData(blbrd);
+        pig.body.setUserData(pig);
 
-
+        armpig.body.setUserData(armpig);
+        steelblock.body.setUserData(steelblock);
+        steelblock2.body.setUserData(steelblock2);
+        steelblock3.body.setUserData(steelblock3);
+        steelslab.body.setUserData(steelslab);
+        steelslab2.body.setUserData(steelslab2);
+        steeltriangle.body.setUserData(steeltriangle);
         BodyDef groundBodyDef = new BodyDef();
         groundBodyDef.type = BodyDef.BodyType.StaticBody;
         groundBodyDef.position.set(WORLD_WIDTH / 2 / 100f, 100/ 100f); // Positioned at the bottom center of the screen in Box2D units
@@ -321,7 +346,105 @@ public class GameScreen1 implements Screen {
 // Attach the shape to the body
         groundBody.createFixture(groundFixtureDef);
         groundShape.dispose(); // Dispose the shape after creating the fixture
+        world.setContactListener(new ContactListener() {
+
+            @Override
+            public void beginContact(Contact contact) {
+                Fixture fixtureA = contact.getFixtureA();
+                Fixture fixtureB = contact.getFixtureB();
+
+                // Check if either fixture belongs to a bird
+                boolean isBirdA = isBird(fixtureA);
+                boolean isBirdB = isBird(fixtureB);
+
+                // Check if either fixture belongs to a pig or structure
+                boolean isPigOrStructureA = isPigOrStructure(fixtureA);
+                boolean isPigOrStructureB = isPigOrStructure(fixtureB);
+
+                // Process collision between bird and pig/structure
+                if (isBirdA && isPigOrStructureB) {
+                    Bird bird = (Bird) fixtureA.getBody().getUserData();
+                    processCollision(fixtureB, bird.attack);
+                    System.out.println("hello");
+                } else if (isBirdB && isPigOrStructureA) {
+                    Bird bird = (Bird) fixtureB.getBody().getUserData();
+                    processCollision(fixtureA, bird.attack);
+                    System.out.println("Out");
+                }
+            }
+
+            @Override
+            public void endContact(Contact contact) {
+                // Optional: Handle end of collision
+            }
+
+            @Override
+            public void preSolve(Contact contact, Manifold oldManifold) {
+                // Optional: Handle pre-solve logic
+            }
+
+            @Override
+            public void postSolve(Contact contact, ContactImpulse impulse) {
+                // Optional: Handle post-solve logic
+            }
+
+            // Check if the fixture is a bird
+            private boolean isBird(Fixture fixture) {
+                return fixture != null && fixture.getBody().getUserData() instanceof Bird;
+            }
+
+            private boolean isPigOrStructure(Fixture fixture) {
+                return fixture != null && (fixture.getBody().getUserData() instanceof Pig ||
+                    fixture.getBody().getUserData() instanceof Structure);
+            }
+            // Handle damage and schedule destruction if necessary
+            public void processCollision(Fixture fixture, float damage) {
+                if (fixture.getBody().getUserData() instanceof Pigs) {
+                    Pigs pig = (Pigs) fixture.getBody().getUserData();
+                    pig.health -= damage;
+                    System.out.println("Pig health: " + pig.health);
+
+                    if (pig.health <= 0) {
+                        pig.destroyed = true; // Mark the pig as destroyed
+                        Gdx.app.log("GameScreen", "Pig destroyed!"); // Debugging log
+                        bodiesToDestroy.add(fixture.getBody()); // Schedule pig body for destruction
+                    }
+                } else if (fixture.getBody().getUserData() instanceof Structure) {
+                    Structure structure = (Structure) fixture.getBody().getUserData();
+                    structure.health -= damage;
+                    System.out.println("Structure health: " + structure.health);
+
+                    if (structure.health <= 0) {
+                        structure.destroyed = true; // Mark the structure as destroyed
+                        Gdx.app.log("GameScreen", "Structure destroyed!"); // Debugging log
+                        bodiesToDestroy.add(fixture.getBody()); // Schedule structure body for destruction
+                    }
+                }
+            }
+
+
+        });
+
+
+
+
+
     }
+    public void update(float deltaTime) {
+        // Step the physics world
+        world.step(deltaTime, 6, 2);
+
+        // Destroy bodies scheduled for removal
+        for (Body body : bodiesToDestroy) {
+            if (body != null && body.isActive()) { // Check if the body is active before destroying
+                Gdx.app.log("GameScreen", "Destroying body: " + body.getUserData()); // Debugging log
+                world.destroyBody(body);
+            }
+        }
+        bodiesToDestroy.clear(); // Clear the list after destroying
+    }
+
+
 
     private Body createBody(World world, BodyDef.BodyType bodyType, float x, float y,
                             Shape shape, float density, float friction, float restitution) {
@@ -340,7 +463,16 @@ public class GameScreen1 implements Screen {
         return body;
     }
 
-
+  public void False(){
+        steelblock.destroyed=false;
+        steelblock2.destroyed=false;
+        steelblock3.destroyed=false;
+        steelslab.destroyed=false;
+        steelslab2.destroyed=false;
+        steeltriangle.destroyed=false;
+        pig.destroyed=false;
+        armpig.destroyed=false;
+  }
 
     private void updateTrajectory() {
         trajectoryPoints.clear();
@@ -360,8 +492,10 @@ public class GameScreen1 implements Screen {
     @Override
     public void render(float delta) {
         // Clear screen and set up the camera
+        update(delta);
         Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         camera.update();
         batch.setProjectionMatrix(camera.combined);
 
@@ -369,48 +503,60 @@ public class GameScreen1 implements Screen {
         batch.begin();
         batch.draw(bg, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
 
-        // Draw building elements and objects as usual
-        batch.draw(steelblock.steelblock,
-            steelblock.body.getPosition().x * 100 - 18,
-            steelblock.body.getPosition().y * 100 - 18,
-            36, 36);
+        // Draw building elements and objects
+        if (steelblock.body != null && !steelblock.destroyed) {
+            batch.draw(steelblock.steelblock,
+                steelblock.body.getPosition().x * 100 - 18,
+                steelblock.body.getPosition().y * 100 - 18,
+                36, 36);
 
-        batch.draw(steelblock2.steelblock,
-            steelblock2.body.getPosition().x * 100 - 18,
-            steelblock2.body.getPosition().y * 100 - 18,
-            36, 36);
+        }
 
-        batch.draw(steelblock3.steelblock,
-            steelblock3.body.getPosition().x * 100 - 18,
-            steelblock3.body.getPosition().y * 100 - 18,
-            36, 36);
+        if (steelblock2.body != null && !steelblock2.destroyed) {
+            batch.draw(steelblock2.steelblock,
+                steelblock2.body.getPosition().x * 100 - 18,
+                steelblock2.body.getPosition().y * 100 - 18,
+                36, 36);
+        }
 
-        if (steeltriangle.body != null) {
+        if (steelblock3.body != null && !steelblock3.destroyed) {
+            batch.draw(steelblock3.steelblock,
+                steelblock3.body.getPosition().x * 100 - 18,
+                steelblock3.body.getPosition().y * 100 - 18,
+                36, 36);
+        }
+
+        if (steeltriangle.body != null && !steeltriangle.destroyed) {
             batch.draw(steeltriangle.region,
                 steeltriangle.body.getPosition().x * 100 - 18,
                 steeltriangle.body.getPosition().y * 100 - 18,
                 36, 36); // Sprite size
         }
-        batch.draw(steelslab.region,
-            steelslab.body.getPosition().x * 100 - 37,
-            steelslab.body.getPosition().y * 100 - 9,
-            74, 18);
 
-        batch.draw(steelslab2.region,
-            steelslab2.body.getPosition().x * 100 - 37,
-            steelslab2.body.getPosition().y * 100 - 9,
-            74, 18);
+        if (steelslab.body != null && !steelslab.destroyed) {
+            batch.draw(steelslab.region,
+                steelslab.body.getPosition().x * 100 - 37,
+                steelslab.body.getPosition().y * 100 - 9,
+                74, 18);
+        }
 
-        // Draw pigs and birds in their correct positions
-        if (armpig.body != null) {
-            batch.draw(armpig.armourpig,
+        if (steelslab2.body != null && !steelslab2.destroyed) {
+            batch.draw(steelslab2.region,
+                steelslab2.body.getPosition().x * 100 - 37,
+                steelslab2.body.getPosition().y * 100 - 9,
+                74, 18);
+        }
+
+        // Draw pigs
+        if (armpig.body != null && !armpig.destroyed) {
+            batch.draw(armpig.textureregion,
                 armpig.body.getPosition().x * 100 - 19.5f,
                 armpig.body.getPosition().y * 100 - 19.5f,
                 39, 39); // Sprite size
         }
 
-        if (pig.body != null) {
-            batch.draw(pig.pig,
+        if (pig.body != null && !pig.destroyed) {
+            batch.draw(pig.textureregion,
                 pig.body.getPosition().x * 100 - 19.5f,
                 pig.body.getPosition().y * 100 - 19.5f,
                 39, 39); // Sprite size
@@ -419,23 +565,23 @@ public class GameScreen1 implements Screen {
         // Draw slingshot (static position)
         batch.draw(slingshot, slingOrigin.x - 25, slingOrigin.y - 35, 50, 67);
 
-        // Draw birds in their correct positions
+        // Draw birds
         for (int i = 0; i < birds.size; i++) {
             Body bird = birds.get(i);
             if (bird != null) {
-                if(i==0){
+                if (i == 0 ) {
                     batch.draw(rdbrd.textureregion,
                         bird.getPosition().x * 100 - 18,
                         bird.getPosition().y * 100 - 18,
                         36, 36);
                 }
-                if(i==1){
+                if (i == 1 ) {
                     batch.draw(blbrd.textureregion,
                         bird.getPosition().x * 100 - 18,
                         bird.getPosition().y * 100 - 18,
                         36, 36);
                 }
-                if(i==2){
+                if (i == 2 ) {
                     batch.draw(prbrd.textureregion,
                         bird.getPosition().x * 100 - 18,
                         bird.getPosition().y * 100 - 18,
@@ -443,15 +589,15 @@ public class GameScreen1 implements Screen {
                 }
             }
         }
+
         // Draw trajectory as a dotted line
         for (Vector2 point : trajectoryPoints) {
             batch.draw(dottexture, point.x + 5, point.y + 10, 3, 3);
         }
 
         batch.end();
-        debugRenderer.render(world, camera.combined.cpy().scl(100)); // Adjust scaling factor for world-to-pixel conversion
 
-        // Render Box2D debug shapes (optional)
+        debugRenderer.render(world, camera.combined.cpy().scl(100)); // Adjust scaling factor for world-to-pixel conversion
 
         // Update the Box2D world step
         world.step(1 / 60f, 6, 2); // Fixed timestep
@@ -460,6 +606,7 @@ public class GameScreen1 implements Screen {
         stage.act(delta);
         stage.draw();
     }
+
 
 
     @Override

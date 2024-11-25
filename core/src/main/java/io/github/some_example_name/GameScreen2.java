@@ -116,9 +116,9 @@ public class GameScreen2 implements Screen {
         batch.draw(steelblock.steelblock,578,226);
         batch.draw(steelblock.steelblock,602,189);
         batch.draw(steelblock.steelblock, 620, 152);
-        batch.draw(chfpig.chiefpig,538,152,39,37);
-        batch.draw(armpig.armourpig,578,152,39,37);
-        batch.draw(kngpig.kingpig,555,260,50,52);
+        batch.draw(chfpig. textureregion,538,152,39,37);
+        batch.draw(armpig. textureregion,578,152,39,37);
+        batch.draw(kngpig. textureregion,555,260,50,52);
 
         batch.draw(tnt,540 + (float) (39 - 37) / 2 + 3,224+ (float) (39 - 37) / 2 + 4, 39 * 0.8f, 37 * 0.8f);
         batch.draw(tnt,578 + (float) (39 - 37) / 2 + 3,224+ (float) (39 - 37) / 2 + 4, 39 * 0.8f, 37 * 0.8f);

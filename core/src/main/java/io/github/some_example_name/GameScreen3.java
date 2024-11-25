@@ -156,13 +156,13 @@ public class GameScreen3 implements Screen {
         batch.draw(icecube.region, 682, 126);
         batch.draw(icecube.region, 720, 128);
         batch.draw(icerod.region, 642, 147);
-        batch.draw(kngpig.kingpig, 665, 152, 50, 52);
-        batch.draw(pg.pig, 455, 63,30,32);
-        batch.draw(minipig.minipig, 640, 63);
-        batch.draw(minipig.minipig, 713, 63);
-        batch.draw(chfpig.chiefpig, 605 + (float) (39 - 37) / 2 + 3, 80 + (float) (39 - 37) / 2 + 4, 39 * 0.8f, 37 * 0.8f);
-        batch.draw(chfpig.chiefpig, 672 + (float) (39 - 37) / 2 + 3, 80 + (float) (39 - 37) / 2 + 4, 39 * 0.8f, 37 * 0.8f);
-        batch.draw(chfpig.chiefpig, 735 + (float) (39 - 37) / 2 + 3, 80 + (float) (39 - 37) / 2 + 4, 39 * 0.8f, 37 * 0.8f);
+        batch.draw(kngpig. textureregion, 665, 152, 50, 52);
+        batch.draw(pg.textureregion, 455, 63,30,32);
+        batch.draw(minipig. textureregion, 640, 63);
+        batch.draw(minipig. textureregion, 713, 63);
+        batch.draw(chfpig. textureregion, 605 + (float) (39 - 37) / 2 + 3, 80 + (float) (39 - 37) / 2 + 4, 39 * 0.8f, 37 * 0.8f);
+        batch.draw(chfpig. textureregion, 672 + (float) (39 - 37) / 2 + 3, 80 + (float) (39 - 37) / 2 + 4, 39 * 0.8f, 37 * 0.8f);
+        batch.draw(chfpig. textureregion, 735 + (float) (39 - 37) / 2 + 3, 80 + (float) (39 - 37) / 2 + 4, 39 * 0.8f, 37 * 0.8f);
 
         batch.draw(tnt, 500 + (float) (39 - 37) / 2 + 3, 137 + (float) (39 - 37) / 2 + 4, 39 * 0.8f, 37 * 0.8f);
         batch.draw(tnt, 538 + (float) (39 - 37) / 2 + 3, 137 + (float) (39 - 37) / 2 + 4, 39 * 0.8f, 37 * 0.8f);
