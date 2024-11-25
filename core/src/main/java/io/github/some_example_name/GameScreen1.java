@@ -72,7 +72,7 @@ public class GameScreen1 implements Screen {
         ImageButton pauseButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(buttons, 408, 174, 118, 108)));
         TextButton dummyButton = new TextButton("Dummy", main.skin);
         trajectoryPoints = new Array<>();
-        world = new World(new Vector2(0, -9.8f), true); // Gravity pointing down
+        world = new World(new Vector2(0, -4.0f), true); // Gravity pointing down
         debugRenderer = new Box2DDebugRenderer(true, true, true, true, true, true);
         this.viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT);
         this.stage = new Stage(viewport, batch);
@@ -156,10 +156,10 @@ public class GameScreen1 implements Screen {
                     // Calculate the launch direction and scale based on the drag distance
                     Vector2 dragVector = slingOrigin.cpy().sub(slingStretch);
                     float distance = dragVector.len(); // Get the length of the drag
-                    float forceScale = Math.min(distance / 100f, 2f); // Scale force based on drag, limit max force to 2
+                    float forceScale = Math.min(distance / 150f, 2f); // Scale force based on drag, limit max force to 2
 
                     // Apply a speed reduction multiplier
-                    float speedMultiplier = 0.5f;  // This scales the speed down to half (adjust as needed)
+                    float speedMultiplier = 0.15f;  // This scales the speed down to half (adjust as needed)
                     Vector2 launchDirection = dragVector.scl(forceScale * speedMultiplier); // Apply scaling to the launch vector
 
                     // Apply the velocity to the bird
@@ -321,8 +321,6 @@ public class GameScreen1 implements Screen {
 // Attach the shape to the body
         groundBody.createFixture(groundFixtureDef);
         groundShape.dispose(); // Dispose the shape after creating the fixture
-
-
     }
 
     private Body createBody(World world, BodyDef.BodyType bodyType, float x, float y,
