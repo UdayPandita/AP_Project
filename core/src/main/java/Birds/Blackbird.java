@@ -8,6 +8,6 @@ public class Blackbird extends Bird {
         texture = new Texture("birds.png");
         textureregion = new TextureRegion(texture, 581, 491, 82, 87);
         health=10;
-        attack=15;
+        attack=8;
     }
 }

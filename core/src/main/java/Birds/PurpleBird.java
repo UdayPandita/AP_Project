@@ -8,6 +8,6 @@ public class PurpleBird extends Bird{
         texture = new Texture("birds.png");
         textureregion = new TextureRegion(texture, 829, 742, 76, 74);
         health = 100;
-        attack=13;
+        attack=8;
     }
 }

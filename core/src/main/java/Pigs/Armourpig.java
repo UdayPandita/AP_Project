@@ -14,4 +14,10 @@ public class Armourpig extends Pig {
         textureregion = new TextureRegion(  texture,192,460,50,43);
         health=10;
     }
+    public int getHealth() {
+        return health;
+    }
+    public void setHealth(int health) {
+        this.health = health;
+    }
 }

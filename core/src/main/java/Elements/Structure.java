@@ -7,10 +7,15 @@ import com.badlogic.gdx.physics.box2d.Body;
 
 public class Structure {
     public Body body;
-    public int health ;
+    public int health;
     public Texture elements;
     public TextureRegion region;
     public boolean destroyed = false;
-
+    public int getHealth() {
+        return health;
+    }
+    public void setHealth(int health) {
+        this.health = health;
+    }
 }
 

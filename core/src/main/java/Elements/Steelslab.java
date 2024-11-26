@@ -15,4 +15,11 @@ public class Steelslab extends Structure{
         region=new TextureRegion(elements,220, 117, 39, 20);
         health=12;
     }
+    @Override
+    public int  getHealth() {
+        return this.health; // Use the specific WoodenStructure health
+    }
+    public void setHealth(int health) {
+        this.health = health;
+    }
 }

@@ -362,6 +362,9 @@ public class GameScreen1 implements Screen {
                     processCollision(fixtureA, bird.attack);
                     System.out.println("Out");
                 }
+
+
+
             }
 
             @Override
@@ -376,8 +379,100 @@ public class GameScreen1 implements Screen {
 
             @Override
             public void postSolve(Contact contact, ContactImpulse impulse) {
-                // Optional: Handle post-solve logic
+                Fixture fixtureA = contact.getFixtureA();
+                Fixture fixtureB = contact.getFixtureB();
+
+                // Check if one fixture is a pig and the other is a structure
+                if (isPigAndStructure(fixtureA, fixtureB)) {
+                    System.out.println("Bye");
+                    applyDamageBasedOnVelocity(fixtureA, fixtureB);
+                }
             }
+
+
+            private boolean isPigAndStructure(Fixture fixtureA, Fixture fixtureB) {
+                boolean isPigA = fixtureA != null && fixtureA.getBody().getUserData() instanceof Pigs;
+                boolean isStructureB = fixtureB != null && fixtureB.getBody().getUserData() instanceof Structure;
+
+                boolean isPigB = fixtureB != null && fixtureB.getBody().getUserData() instanceof Pigs;
+                boolean isStructureA = fixtureA != null && fixtureA.getBody().getUserData() instanceof Structure;
+
+                return (isPigA && isStructureB) || (isPigB && isStructureA);
+            }
+
+            private void applyDamageBasedOnVelocity(Fixture fixtureA, Fixture fixtureB) {
+                Body structureBody = null;
+                Pigs pig = null;
+
+                // Identify which fixture is the structure and which is the pig
+                if (fixtureA.getBody().getUserData() instanceof Structure &&
+                    fixtureB.getBody().getUserData() instanceof Pigs) {
+                    structureBody = fixtureA.getBody();
+                    pig = (Pigs) fixtureB.getBody().getUserData();
+                } else if (fixtureB.getBody().getUserData() instanceof Structure &&
+                    fixtureA.getBody().getUserData() instanceof Pigs) {
+                    structureBody = fixtureB.getBody();
+                    pig = (Pigs) fixtureA.getBody().getUserData();
+                }
+
+                if (structureBody == null || pig == null) return;
+
+                // Get the vertical velocity of the structure
+                float verticalVelocity = structureBody.getLinearVelocity().y;
+
+                // Check if the structure is falling fast enough (negative y indicates downward motion)
+                if (verticalVelocity < -0.5f) { // Threshold for falling velocity
+                    float damageAmount = Math.abs(verticalVelocity) * 5f; // Scale damage with speed
+                    processHealthReduction(pig, (Structure) structureBody.getUserData(), damageAmount);
+                }
+            }
+
+
+            // Apply damage to pig and structure based on collision force
+            private void applyDamageForPigAndStructure(Fixture fixtureA, Fixture fixtureB, float collisionForce) {
+                if (fixtureA.getBody().getUserData() instanceof Pigs &&
+                    fixtureB.getBody().getUserData() instanceof Structure) {
+                    Pigs pig = (Pigs) fixtureA.getBody().getUserData();
+                    Structure structure = (Structure) fixtureB.getBody().getUserData();
+                    processHealthReduction(pig, structure, collisionForce);
+                } else if (fixtureB.getBody().getUserData() instanceof Pigs &&
+                    fixtureA.getBody().getUserData() instanceof Structure) {
+                    Pigs pig = (Pigs) fixtureB.getBody().getUserData();
+                    Structure structure = (Structure) fixtureA.getBody().getUserData();
+                    processHealthReduction(pig, structure, collisionForce);
+                }
+            }
+
+            // Reduce health for pig and structure based on collision force
+            private void processHealthReduction(Pigs pig, Structure structure, float collisionForce) {
+                float damageAmount = collisionForce ; // Scale damage based on force
+              int   currenthealth=pig.getHealth();
+              int currenthealth2=structure.getHealth();
+                System.out.println(currenthealth);
+                System.out.println(currenthealth2);
+                System.out.println("Touched");
+                currenthealth -= damageAmount;
+                currenthealth2 -= damageAmount;
+                System.out.println(currenthealth);
+                System.out.println(currenthealth2);
+                pig.setHealth(currenthealth);
+                structure.setHealth(currenthealth2);
+
+                System.out.println("Pig health after collision: " + pig.health);
+
+                if (currenthealth <= 0) {
+                    pig.destroyed = true;
+                    Gdx.app.log("GameScreen", "Pig destroyed in collision with structure!");
+                    bodiesToDestroy.add(pig.body); // Schedule pig body for destruction
+                }
+                if (currenthealth2 <= 0) {
+                    structure.destroyed = true;
+                    Gdx.app.log("GameScreen", "Structure destroyed in structure!");
+                    bodiesToDestroy.add(structure.body);
+                }
+            }
+
+
 
             // Check if the fixture is a bird
             private boolean isBird(Fixture fixture) {
@@ -392,20 +487,29 @@ public class GameScreen1 implements Screen {
             public void processCollision(Fixture fixture, float damage) {
                 if (fixture.getBody().getUserData() instanceof Pigs) {
                     Pigs pig = (Pigs) fixture.getBody().getUserData();
-                    pig.health -= damage;
+                    int currentHealth = pig.getHealth();
+                    currentHealth -= damage;
+                    pig.setHealth(currentHealth);
+
                     System.out.println("Pig health: " + pig.health);
 
-                    if (pig.health <= 0) {
+                    if (currentHealth <= 0) {
                         pig.destroyed = true; // Mark the pig as destroyed
                         Gdx.app.log("GameScreen", "Pig destroyed!"); // Debugging log
                         bodiesToDestroy.add(fixture.getBody()); // Schedule pig body for destruction
                     }
                 } else if (fixture.getBody().getUserData() instanceof Structure) {
                     Structure structure = (Structure) fixture.getBody().getUserData();
-                    structure.health -= damage;
+
+                    System.out.println(damage);
+                    int currentHealth = structure.getHealth();
+                    System.out.println(currentHealth);
+                  currentHealth -= damage;
+                    structure.setHealth(currentHealth);
+
                     System.out.println("Structure health: " + structure.health);
 
-                    if (structure.health <= 0) {
+                    if (currentHealth <= 0) {
                         structure.destroyed = true; // Mark the structure as destroyed
                         Gdx.app.log("GameScreen", "Structure destroyed!"); // Debugging log
                         bodiesToDestroy.add(fixture.getBody()); // Schedule structure body for destruction

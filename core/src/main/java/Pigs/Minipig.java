@@ -10,4 +10,10 @@ public class Minipig extends Pig {
         textureregion = new TextureRegion(texture,57, 509, 24, 23);
         health = 2;
     }
+    public int getHealth() {
+        return health;
+    }
+    public void setHealth(int health) {
+        this.health = health;
+    }
 }
