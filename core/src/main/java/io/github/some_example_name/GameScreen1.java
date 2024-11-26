@@ -448,7 +448,27 @@ public class GameScreen1 implements Screen {
 
     }
 
-
+    private boolean lose() {
+        boolean check1 = false;
+        for (Pigs pig : Pig) {
+            if (pig.destroyed) {
+                check1 = true;
+            } else {
+                check1 = false;
+                break;
+            }
+        }
+        boolean check2 = false;
+        for (Bird bird : birds) {
+            if (bird.destroyed) {
+                check2 = true;
+            } else {
+                check2 = false;
+                break;
+            }
+        }
+        return !check1 && check2;
+    }
 
     private Body createBody(World world, BodyDef.BodyType bodyType, float x, float y,
                             Shape shape, float density, float friction, float restitution) {
@@ -608,6 +628,11 @@ public class GameScreen1 implements Screen {
 
         // Update the Box2D world step
         world.step(1 / 60f, 6, 2); // Fixed timestep
+
+        if (lose()) {
+            main.lscreen.previousScreen = main.game1;
+            main.setScreen(main.lscreen);
+        }
 
         // Draw stage UI elements
         stage.act(delta);
