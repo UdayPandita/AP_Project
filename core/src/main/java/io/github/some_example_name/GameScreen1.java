@@ -261,15 +261,15 @@ public class GameScreen1 implements Screen {
         // Create Red Bird body at a reasonable height
         rdbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
             80 / 100f, 120/ 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (80px, 200px) in Box2D world
-
+       rdbrd.body.setLinearDamping(1);
 // Create Black Bird body at a reasonable height
         blbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
             60/ 100f, 120 / 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (160px, 200px) in Box2D world
-
+        blbrd.body.setLinearDamping(1);
 // Create Purple Bird body at a reasonable height
         prbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
             40 / 100f, 120 / 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (240px, 200px) in Box2D world
-
+        prbrd.body.setLinearDamping(1);
         birds.add(rdbrd);
         birds.add(blbrd);
         birds.add(prbrd);
