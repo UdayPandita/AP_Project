@@ -60,6 +60,7 @@ public class OptionsScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.app.log("OptionsScreen", "Back button clicked");
+
                 main.setScreen(previousScreen);
             }
         });

@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import Birds.*;
@@ -24,7 +25,9 @@ import Elements.*;
 import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 public class GameScreen1 implements Screen {
     private final Main main;
@@ -55,11 +58,12 @@ public class GameScreen1 implements Screen {
     private Vector2 slingStretch = new Vector2(slingOrigin); // Stretching position
     private boolean dragging = false; // To check if dragging is happening
     private Array<Vector2> trajectoryPoints; // Array to store trajectory points for dotted line
-    private Array<Body> birds; // Array to store bird bodies
+    private Array<Bird> birds; // Array to store bird bodies
     private int currentBirdIndex;
     private Array<Pigs> Pig;
     private Array<Structure> Structure;
     private  Array<Body> bodiesToDestroy;
+    private Map<Bird, Long> birdLaunchTimes = new HashMap<>();
     public GameScreen1(final Main main) {
         this.main = main;
         this.batch = main.batch;
@@ -161,7 +165,6 @@ public class GameScreen1 implements Screen {
                 }
                 return false;  // Allow the event to propagate to the next input processor (the stage)
             }
-
             @Override
             public boolean touchUp(int screenX, int screenY, int pointer, int button) {
                 if (dragging) {
@@ -177,10 +180,15 @@ public class GameScreen1 implements Screen {
 
                     // Apply the velocity to the bird
                     if (currentBirdIndex < birds.size) {
-                        Body bird = birds.get(currentBirdIndex); // Get the current bird
+                        Body bird = birds.get(currentBirdIndex).body; // Get the current bird
                         bird.setTransform(slingOrigin.x / 100f, slingOrigin.y / 100f, 0); // Set bird position
                         bird.setLinearVelocity(launchDirection); // Apply velocity to launch the bird
                         bird.setActive(true); // Activate the bird in the world
+
+                        // Store the launch time for the bird
+                        birdLaunchTimes.put(birds.get(currentBirdIndex), TimeUtils.nanoTime());
+
+
                         currentBirdIndex++; // Move to the next bird
                     }
 
@@ -190,7 +198,6 @@ public class GameScreen1 implements Screen {
                 }
                 return false;
             }
-
 
         });
 
@@ -263,9 +270,9 @@ public class GameScreen1 implements Screen {
         prbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
             40 / 100f, 120 / 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (240px, 200px) in Box2D world
 
-        birds.add(rdbrd.body);
-        birds.add(blbrd.body);
-        birds.add(prbrd.body);
+        birds.add(rdbrd);
+        birds.add(blbrd);
+        birds.add(prbrd);
 
         birdShape.dispose(); // Dispose the shape after useer use
 
@@ -442,6 +449,22 @@ public class GameScreen1 implements Screen {
             }
         }
         bodiesToDestroy.clear(); // Clear the list after destroying
+
+        Iterator<Map.Entry<Bird, Long>> iter = birdLaunchTimes.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<Bird, Long> entry = iter.next();
+            Body bird = entry.getKey().body;
+            long launchTime = entry.getValue();
+
+            // Check if 15 seconds have passed (15 seconds = 15,000,000,000 nanoseconds)
+            if (TimeUtils.nanoTime() - launchTime > 8_000_000_000L) {
+                // Remove the bird from the world
+                world.destroyBody(bird);
+                entry.getKey().destroyed = true;
+                iter.remove();  // Remove from the tracking map
+            }
+        }
+
     }
 
 
@@ -472,6 +495,9 @@ public class GameScreen1 implements Screen {
         steeltriangle.destroyed=false;
         pig.destroyed=false;
         armpig.destroyed=false;
+        rdbrd.destroyed=false;
+        blbrd.destroyed=false;
+        prbrd.destroyed=false;
   }
 
     private void updateTrajectory() {
@@ -567,8 +593,8 @@ public class GameScreen1 implements Screen {
 
         // Draw birds
         for (int i = 0; i < birds.size; i++) {
-            Body bird = birds.get(i);
-            if (bird != null) {
+            Body bird = birds.get(i).body;
+            if (bird != null && !birds.get(i).destroyed) {
                 if (i == 0 ) {
                     batch.draw(rdbrd.textureregion,
                         bird.getPosition().x * 100 - 18,

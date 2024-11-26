@@ -10,4 +10,5 @@ public class Bird {
     public int health;
     public int attack;
     public Body body;
+    public boolean destroyed=false;
 }

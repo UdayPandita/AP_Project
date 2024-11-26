@@ -64,6 +64,9 @@ class PauseMenu implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.app.log("PauseMenu", "Resume button clicked");
+                if (previousScreen instanceof GameScreen1) {
+                    ((GameScreen1) previousScreen).False();
+                }
                 main.setScreen(previousScreen);
             }
         });
@@ -72,6 +75,9 @@ class PauseMenu implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.app.log("PauseMenu", "Restart button clicked");
+                if (previousScreen instanceof GameScreen1) {
+                    ((GameScreen1) previousScreen).False();
+                }
                 main.setScreen(previousScreen);
             }
         });
