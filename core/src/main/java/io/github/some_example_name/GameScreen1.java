@@ -157,7 +157,7 @@ public class GameScreen1 implements Screen {
                     float forceScale = Math.min(distance / 150f, 2f); // Scale force based on drag, limit max force to 2
 
                     // Apply a speed reduction multiplier
-                    float speedMultiplier = 0.15f;  // This scales the speed down to half (adjust as needed)
+                    float speedMultiplier = 0.25f;  // This scales the speed down to half (adjust as needed)
                     Vector2 launchDirection = dragVector.scl(forceScale * speedMultiplier); // Apply scaling to the launch vector
 
                     // Apply the velocity to the bird
