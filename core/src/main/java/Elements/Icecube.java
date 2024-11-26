@@ -12,4 +12,10 @@ public class Icecube {
         region=new TextureRegion(elements,442, 159, 22, 20);
         health=5;
     }
+    public int gethealth() {
+        return health;
+    }
+    public void sethealth(int health) {
+        this.health = health;
+    }
 }

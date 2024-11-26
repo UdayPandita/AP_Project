@@ -56,10 +56,8 @@ public class LoseScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.app.log("LoseScreen", "Back button clicked");
-                if (previousScreen instanceof GameScreen1) {
-                    ((GameScreen1) previousScreen).False();
-                }
-                main.setScreen(previousScreen);
+
+                main.setScreen(main.level);
             }
         });
 

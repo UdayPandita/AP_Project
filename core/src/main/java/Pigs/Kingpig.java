@@ -10,10 +10,10 @@ public class Kingpig extends Pig {
         textureregion = new TextureRegion(  texture,21,1,67,81);
        health = 20;
     }
-    public int getHealth() {
+    public int gethealth() {
         return health;
     }
-    public void setHealth(int health) {
+    public void sethealth(int health) {
         this.health = health;
     }
 }

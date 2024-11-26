@@ -11,10 +11,10 @@ public class Structure {
     public Texture elements;
     public TextureRegion region;
     public boolean destroyed = false;
-    public int getHealth() {
+    public int gethealth() {
         return health;
     }
-    public void setHealth(int health) {
+    public void sethealth(int health) {
         this.health = health;
     }
 }

@@ -446,8 +446,8 @@ public class GameScreen1 implements Screen {
             // Reduce health for pig and structure based on collision force
             private void processHealthReduction(Pigs pig, Structure structure, float collisionForce) {
                 float damageAmount = collisionForce ; // Scale damage based on force
-              int   currenthealth=pig.getHealth();
-              int currenthealth2=structure.getHealth();
+              int   currenthealth=pig.gethealth();
+              int currenthealth2=structure.gethealth();
                 System.out.println(currenthealth);
                 System.out.println(currenthealth2);
                 System.out.println("Touched");
@@ -455,8 +455,8 @@ public class GameScreen1 implements Screen {
                 currenthealth2 -= damageAmount;
                 System.out.println(currenthealth);
                 System.out.println(currenthealth2);
-                pig.setHealth(currenthealth);
-                structure.setHealth(currenthealth2);
+                pig.sethealth(currenthealth);
+                structure.sethealth(currenthealth2);
 
                 System.out.println("Pig health after collision: " + pig.health);
 
@@ -487,9 +487,9 @@ public class GameScreen1 implements Screen {
             public void processCollision(Fixture fixture, float damage) {
                 if (fixture.getBody().getUserData() instanceof Pigs) {
                     Pigs pig = (Pigs) fixture.getBody().getUserData();
-                    int currentHealth = pig.getHealth();
+                    int currentHealth = pig.gethealth();
                     currentHealth -= damage;
-                    pig.setHealth(currentHealth);
+                    pig.sethealth(currentHealth);
 
                     System.out.println("Pig health: " + pig.health);
 
@@ -502,10 +502,10 @@ public class GameScreen1 implements Screen {
                     Structure structure = (Structure) fixture.getBody().getUserData();
 
                     System.out.println(damage);
-                    int currentHealth = structure.getHealth();
+                    int currentHealth = structure.gethealth();
                     System.out.println(currentHealth);
                   currentHealth -= damage;
-                    structure.setHealth(currentHealth);
+                    structure.sethealth(currentHealth);
 
                     System.out.println("Structure health: " + structure.health);
 
@@ -760,7 +760,7 @@ public class GameScreen1 implements Screen {
             main.setScreen(main.wscreen);
         }
         if (lose()) {
-            main.lscreen.previousScreen = main.game1;
+
             main.setScreen(main.lscreen);
         }
 

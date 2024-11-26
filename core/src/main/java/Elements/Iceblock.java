@@ -11,4 +11,10 @@ public class Iceblock {
         region=new TextureRegion(elements,324, 0, 39, 41);
         health=5;
     }
+    public int gethealth() {
+        return health;
+    }
+    public void sethealth(int health) {
+        this.health = health;
+    }
 }

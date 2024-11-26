@@ -17,10 +17,10 @@ public class SteelTriangle extends Structure {
     }
 
     @Override
-    public int getHealth() {
+    public int gethealth() {
         return this.health; // Use the specific WoodenStructure health
     }
-    public void setHealth(int health) {
+    public void sethealth(int health) {
         this.health = health;
     }
 }

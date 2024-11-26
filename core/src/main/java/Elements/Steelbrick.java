@@ -12,4 +12,10 @@ public class Steelbrick {
         region=new TextureRegion(elements,496, 62, 22, 12);
         health=12;
     }
+    public int gethealth() {
+        return health;
+    }
+    public void sethealth(int health) {
+        this.health = health;
+    }
 }

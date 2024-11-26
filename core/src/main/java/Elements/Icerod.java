@@ -11,4 +11,10 @@ public class Icerod {
         region=new TextureRegion(elements,238, 231, 100, 9);
         health=5;
     }
+    public int gethealth() {
+        return health;
+    }
+    public void sethealth(int health) {
+        this.health = health;
+    }
 }

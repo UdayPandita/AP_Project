@@ -12,4 +12,10 @@ public class Woodblock{
         region=new TextureRegion(elements,0, 40, 41, 41);
         health=8;
     }
+    public int gethealth() {
+        return health;
+    }
+    public void sethealth(int health) {
+        this.health = health;
+    }
 }
