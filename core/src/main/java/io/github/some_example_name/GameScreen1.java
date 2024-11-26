@@ -105,26 +105,7 @@ public class GameScreen1 implements Screen {
         table.top().right();
         table.add(dummyButton).pad(10).width(80);
         table.add(pauseButton).pad(10).width(80);
-
-        pauseButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                Gdx.app.log("GameScreen", "Pause button clicked");
-                False();
-                main.pause.previousScreen = main.game1;
-                main.setScreen(main.pause);
-            }
-        });
-        dummyButton.addListener(new ChangeListener() {
-            public void changed(ChangeEvent event, Actor actor) {
-                Gdx.app.log("GameScreen", "Dummy button clicked");
-                False();
-                main.wscreen.previousScreen = main.game1;
-                main.setScreen(main.wscreen);
-            }
-        });
     }
-
 
     @Override
     public void show() {
@@ -241,8 +222,8 @@ public class GameScreen1 implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.app.log("GameScreen", "Dummy button clicked");
-                main.wscreen.previousScreen = main.game1;
-                main.setScreen(main.wscreen);
+                main.lscreen.previousScreen = main.game1;
+                main.setScreen(main.lscreen);
             }
         });
 
@@ -486,7 +467,7 @@ public class GameScreen1 implements Screen {
         return body;
     }
 
-  public void False(){
+    public void False(){
         steelblock.destroyed=false;
         steelblock2.destroyed=false;
         steelblock3.destroyed=false;
@@ -498,7 +479,7 @@ public class GameScreen1 implements Screen {
         rdbrd.destroyed=false;
         blbrd.destroyed=false;
         prbrd.destroyed=false;
-  }
+    }
 
     private void updateTrajectory() {
         trajectoryPoints.clear();

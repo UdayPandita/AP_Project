@@ -20,6 +20,7 @@ public class Main extends Game {
     WinScreen wscreen;
     OptionsScreen options;
     SaveScreen saves;
+    LoseScreen lscreen;
     Texture bg;
 
     @Override
@@ -30,6 +31,7 @@ public class Main extends Game {
         menu = new MainMenu(this);
         pause = new PauseMenu(this);
         wscreen = new WinScreen(this);
+        lscreen = new LoseScreen(this);
         level = new LevelScreen(this);
         game1 = new GameScreen1(this);
         game2 = new GameScreen2(this);
