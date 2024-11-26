@@ -272,6 +272,8 @@ public class GameScreen1 implements Screen {
             520 / 100f, 120 / 100f, pigShape, 1f, 1.5f, 0.5f);
         pig.body.setLinearDamping(2.0f);
         pigShape.dispose();
+        Pig.add(pig);
+        Pig.add(armpig);
 
 
         PolygonShape steelblockShape = new PolygonShape();
@@ -439,13 +441,14 @@ public class GameScreen1 implements Screen {
             long launchTime = entry.getValue();
 
             // Check if 15 seconds have passed (15 seconds = 15,000,000,000 nanoseconds)
-            if (TimeUtils.nanoTime() - launchTime > 8_000_000_000L) {
+            if (TimeUtils.nanoTime() - launchTime > 4_000_000_000L) {
                 // Remove the bird from the world
                 world.destroyBody(bird);
                 entry.getKey().destroyed = true;
                 iter.remove();  // Remove from the tracking map
             }
         }
+
 
     }
 
@@ -484,9 +487,10 @@ public class GameScreen1 implements Screen {
                 break;
             }
         }
-        System.out.println(Pig.size);
         return check;
     }
+
+
 
     private Body createBody(World world, BodyDef.BodyType bodyType, float x, float y,
                             Shape shape, float density, float friction, float restitution) {
