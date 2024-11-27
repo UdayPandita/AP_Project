@@ -2,6 +2,7 @@ package io.github.some_example_name;
 // Updated
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -22,6 +23,7 @@ public class Main extends Game {
     SaveScreen saves;
     LoseScreen lscreen;
     Texture bg;
+    Music backgroundMusic;
 
     @Override
     public void create() {
@@ -39,6 +41,12 @@ public class Main extends Game {
         options = new OptionsScreen(this);
         saves = new SaveScreen(this);
         bg = new Texture("mainmenu.png");
+
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("soundtrack.mp3"));
+
+        backgroundMusic.setLooping(true);
+        backgroundMusic.setVolume(0.5f); // Adjust volume as needed
+        backgroundMusic.play(); // Start playing background mu
 
         setScreen(menu);
 

@@ -44,7 +44,12 @@ public class OptionsScreen implements Screen {
                 soundOn = !soundOn;
                 soundButton.setText(soundOn ? "Sound: ON" : "Sound: OFF");
                 Gdx.app.log("OptionsScreen", "Sound toggled: " + (soundOn ? "ON" : "OFF"));
-                // TODO: Implement actual sound toggle logic
+                if (soundOn) {
+                    main.backgroundMusic.setVolume(0.5f);
+                    main.backgroundMusic.play();
+                } else {
+                    main.backgroundMusic.pause();
+                }
             }
         });
 
