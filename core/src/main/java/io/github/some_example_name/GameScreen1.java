@@ -355,11 +355,11 @@ public class GameScreen1 implements Screen {
                 // Process collision between bird and pig/structure
                 if (isBirdA && isPigOrStructureB) {
                     Bird bird = (Bird) fixtureA.getBody().getUserData();
-                    processCollision(fixtureB, bird.attack);
+                    processCollision(fixtureB, bird.getattack());
                     System.out.println("hello");
                 } else if (isBirdB && isPigOrStructureA) {
                     Bird bird = (Bird) fixtureB.getBody().getUserData();
-                    processCollision(fixtureA, bird.attack);
+                    processCollision(fixtureA, bird.getattack());
                     System.out.println("Out");
                 }
 

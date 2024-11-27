@@ -659,13 +659,13 @@ public class GameScreen2 implements Screen {
         if (steelblock3.body != null && !steelblock3.destroyed) {
             batch.draw(steelblock3.steelblock,
                 steelblock3.body.getPosition().x * 100 - 18,
-                steelblock4.body.getPosition().y * 100 - 18,
+                steelblock3.body.getPosition().y * 100 - 18,
                 36, 36);
         }
         if (steelblock4.body != null && !steelblock4.destroyed) {
             batch.draw(steelblock4.steelblock,
                 steelblock4.body.getPosition().x * 100 - 18,
-                steelblock3.body.getPosition().y * 100 - 18,
+                steelblock4.body.getPosition().y * 100 - 18,
                 36, 36);
         }
         if (steelblock5.body != null && !steelblock5.destroyed) {

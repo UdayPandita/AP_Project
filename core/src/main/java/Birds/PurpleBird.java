@@ -10,4 +10,8 @@ public class PurpleBird extends Bird{
         health = 100;
         attack=8;
     }
+    @Override
+    public int getattack() {
+        return attack;
+    }
 }

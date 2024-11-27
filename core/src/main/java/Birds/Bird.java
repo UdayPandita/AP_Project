@@ -11,4 +11,7 @@ public class Bird {
     public int attack;
     public Body body;
     public boolean destroyed=false;
+    public int getattack() {
+        return attack;
+    }
 }

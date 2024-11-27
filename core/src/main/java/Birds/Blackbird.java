@@ -10,4 +10,8 @@ public class Blackbird extends Bird {
         health=10;
         attack=8;
     }
+    @Override
+    public int getattack() {
+        return attack;
+    }
 }
