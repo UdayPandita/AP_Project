@@ -103,7 +103,6 @@ public class GameScreen1 implements Screen {
         stage.addActor(table);
 
         table.top().right();
-        table.add(dummyButton).pad(10).width(80);
         table.add(pauseButton).pad(10).width(80);
     }
 
@@ -219,21 +218,13 @@ public class GameScreen1 implements Screen {
             }
         });
 
-        dummyButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                Gdx.app.log("GameScreen", "Dummy button clicked");
-                main.lscreen.previousScreen = main.game1;
-                main.setScreen(main.lscreen);
-            }
-        });
+
 
         // Add buttons to the layout
         Table table = new Table();
         table.setFillParent(true);
         stage.addActor(table);
         table.top().right();
-        table.add(dummyButton).pad(10).width(80);
         table.add(pauseButton).pad(10).width(80);
 
         // Define and create Box2D bodies for the birds and pigs.

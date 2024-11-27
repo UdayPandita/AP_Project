@@ -149,7 +149,6 @@ public class GameScreen3 implements Screen {
         stage.addActor(table);
 
         table.top().right();
-        table.add(dummyButton).pad(10).width(80);
         table.add(pauseButton).pad(10).width(80);
 
         pauseButton.addListener(new ChangeListener() {
@@ -160,15 +159,7 @@ public class GameScreen3 implements Screen {
                 main.setScreen(main.pause);
             }
         });
-        dummyButton.addListener(new ChangeListener(){
-            public void changed(ChangeEvent event, Actor actor) {
-                Gdx.app.log("GameScreen", "Dummy button clicked");
-                main.wscreen.previousScreen = main.game3;
-                main.setScreen(main.wscreen);
 
-            }
-
-        });
     }
 
     @Override
@@ -283,21 +274,13 @@ public class GameScreen3 implements Screen {
             }
         });
 
-        dummyButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                Gdx.app.log("GameScreen", "Dummy button clicked");
-                main.lscreen.previousScreen = main.game1;
-                main.setScreen(main.lscreen);
-            }
-        });
+
 
         // Add buttons to the layout
         Table table = new Table();
         table.setFillParent(true);
         stage.addActor(table);
         table.top().right();
-        table.add(dummyButton).pad(10).width(80);
         table.add(pauseButton).pad(10).width(80);
 
         CircleShape birdShape = new CircleShape();
@@ -315,7 +298,7 @@ rdbrd2.body.setLinearDamping(1);
         blbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
             60/ 100f, 195 / 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (160px, 200px) in Box2D world
         blbrd.body.setLinearDamping(1);
-// Create Purple Bird body at a reasonable height
+
         prbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
             40 / 100f, 195 / 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (240px, 200px) in Box2D world
         prbrd.body.setLinearDamping(1);
@@ -328,7 +311,7 @@ rdbrd2.body.setLinearDamping(1);
         CircleShape pigShape = new CircleShape();
         pigShape.setRadius(19.5f / 100f); // 19.5 pixels converted to Box2D units
         kngpig.body=createBody(world,BodyDef.BodyType.DynamicBody,665/100f,152/100f,pigShape,1f,5.0f,0.5f);
-        kngpig.body.setLinearDamping(10.0f);
+        kngpig.body.setLinearDamping(11.0f);
 
         pg.body=createBody(world,BodyDef.BodyType.DynamicBody,455/100f,63/100f,pigShape,1f,5.0f,0.5f);
         pg.body.setLinearDamping(2.0f);
@@ -392,7 +375,7 @@ rdbrd2.body.setLinearDamping(1);
         PolygonShape icecubeshape = new PolygonShape();
         icecubeshape.setAsBox(22 / 200f, 20 / 200f); // Half-width: 22/200, Half-height: 20/200
 // Ice Cube Bodies
-        icecube.body = createBody(world, BodyDef.BodyType.DynamicBody, 615 / 100f, 140 / 100f, icecubeshape, 5f, 0.8f, 0.0f);
+        icecube.body = createBody(world, BodyDef.BodyType.DynamicBody, 610 / 100f, 140 / 100f, icecubeshape, 5f, 0.8f, 0.0f);
         icecube2.body = createBody(world, BodyDef.BodyType.DynamicBody, 682 / 100f, 126 / 100f, icecubeshape, 5f, 0.8f, 0.0f);
         icecube3.body = createBody(world, BodyDef.BodyType.DynamicBody, 730/ 100f, 150 / 100f, icecubeshape, 5f, 0.8f, 0.0f);
         icecubeshape.dispose();
@@ -643,6 +626,61 @@ rdbrd2.body.setLinearDamping(1);
 
 
 
+
+
+    }
+
+    public void False(){
+        rdbrd.destroyed=false;
+        rdbrd2.destroyed=false;
+        prbrd.destroyed=false;
+        blbrd.destroyed=false;
+        iceblock.destroyed=false;
+        iceblock2.destroyed=false;
+        iceblock3.destroyed=false;
+        iceblock4.destroyed=false;
+        iceblock5.destroyed=false;
+        iceblock6.destroyed=false;
+        iceblock7.destroyed=false;
+        iceblock8.destroyed=false;
+        icecube.destroyed=false;
+        icecube2.destroyed=false;
+        icecube3.destroyed=false;
+        woodblock.destroyed=false;
+        woodblock2.destroyed=false;
+        woodblock3.destroyed=false;
+        steelslab.destroyed=false;
+        steelslab2.destroyed=false;
+        steelslab3.destroyed=false;
+        steelslab4.destroyed=false;
+        icerod.destroyed=false;
+        steelbrick.destroyed=false;
+        steelbrick2.destroyed=false;
+        steelbrick3.destroyed=false;
+        kngpig.destroyed=false;
+        pg.destroyed=false;
+        minipig.destroyed=false;
+        minipig2.destroyed=false;
+        iceblock.health=5;
+        iceblock2.health=5;
+        iceblock3.health=5;
+        iceblock4.health=5;
+        iceblock5.health=5;
+        iceblock6.health=5;
+        iceblock7.health=5;
+        iceblock8.health=5;
+         steelslab.health=12;
+         steelslab2.health=12;
+         steelslab3.health=12;
+         steelslab4.health=12;
+         steelbrick.health=12;
+         steelbrick2.health=12;
+         steelbrick3.health=12;
+         woodblock.health=8;
+         woodblock2.health=8;
+         woodblock3.health=8;
+         icecube.health=5;
+         icecube2.health=5;
 
 
     }
@@ -1026,7 +1064,7 @@ rdbrd2.body.setLinearDamping(1);
         world.step(1 / 60f, 6, 2); // Fixed timestep
 
         if (win()) {
-            main.wscreen.previousScreen = main.game2;
+            main.wscreen.previousScreen = main.game3;
             main.setScreen(main.wscreen);
         }
 

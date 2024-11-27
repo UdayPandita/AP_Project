@@ -56,6 +56,7 @@ public class LoseScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.app.log("LoseScreen", "Back button clicked");
+
                 main.setScreen(main.level);
             }
         });
