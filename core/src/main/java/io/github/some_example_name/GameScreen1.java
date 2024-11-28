@@ -58,12 +58,13 @@ public class GameScreen1 implements Screen {
     private Vector2 slingStretch = new Vector2(slingOrigin); // Stretching position
     private boolean dragging = false; // To check if dragging is happening
     private Array<Vector2> trajectoryPoints; // Array to store trajectory points for dotted line
-    private Array<Bird> birds; // Array to store bird bodies
+    public Array<Bird> birds; // Array to store bird bodies
     private int currentBirdIndex;
-    private Array<Pigs> Pig;
-    private Array<Structure> Structure;
-    private  Array<Body> bodiesToDestroy;
+    public Array<Pigs> Pig;
+    public Array<Structure> Structure;
+    public Array<Body> bodiesToDestroy;
     private Map<Bird, Long> birdLaunchTimes = new HashMap<>();
+    public SaveData saveData;
     public GameScreen1(final Main main) {
         this.main = main;
         this.batch = main.batch;
@@ -105,6 +106,32 @@ public class GameScreen1 implements Screen {
         table.top().right();
         table.add(dummyButton).pad(10).width(80);
         table.add(pauseButton).pad(10).width(80);
+    }
+
+    public SaveData save() {
+        saveData = new SaveData();
+        for (Bird bird : birds) {
+            saveData.addBird(bird);
+        }
+        for (Pigs pig : Pig) {
+            saveData.addPig(pig);
+        }
+        for (Structure structure : Structure) {
+            saveData.addStructure(structure);
+        }
+        return saveData;
+    }
+
+    public void load(SaveData saveData) {
+        for (Bird bird : saveData.birds) {
+            birds.add(bird);
+        }
+        for (Pigs pig : saveData.pigs) {
+            Pig.add(pig);
+        }
+        for (Structure structure : saveData.structures) {
+            Structure.add(structure);
+        }
     }
 
     @Override
@@ -215,6 +242,7 @@ public class GameScreen1 implements Screen {
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.app.log("GameScreen", "Pause button clicked");
                 main.pause.previousScreen = main.game1;
+                main.pause.saveData = save();
                 main.setScreen(main.pause);
             }
         });
@@ -243,7 +271,7 @@ public class GameScreen1 implements Screen {
         // Create Red Bird body at a reasonable height
         rdbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
             80 / 100f, 120/ 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (80px, 200px) in Box2D world
-       rdbrd.body.setLinearDamping(1);
+        rdbrd.body.setLinearDamping(1);
 // Create Black Bird body at a reasonable height
         blbrd.body = createBody(world, BodyDef.BodyType.DynamicBody,
             60/ 100f, 120 / 100f, birdShape, 1f, 0.3f, 0.5f); // Place bird at (160px, 200px) in Box2D world
@@ -256,7 +284,7 @@ public class GameScreen1 implements Screen {
         birds.add(blbrd);
         birds.add(prbrd);
 
-        birdShape.dispose(); // Dispose the shape after useer use
+        birdShape.dispose(); // Dispose the shape after user use
 
         CircleShape pigShape = new CircleShape();
         pigShape.setRadius(19.5f / 100f); // 19.5 pixels converted to Box2D units

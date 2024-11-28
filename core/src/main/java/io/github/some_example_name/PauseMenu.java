@@ -22,6 +22,7 @@ class PauseMenu implements Screen {
     private final OrthographicCamera camera;
     private final Viewport viewport;
     public Screen previousScreen;
+    public SaveData saveData;
     private final Texture bg;
     private final SpriteBatch batch;
 
@@ -65,7 +66,8 @@ class PauseMenu implements Screen {
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.app.log("PauseMenu", "Resume button clicked");
                 if (previousScreen instanceof GameScreen1) {
-                    ((GameScreen1) previousScreen).False();
+                    previousScreen = new GameScreen1(main);
+                    ((GameScreen1) previousScreen).load(saveData);
                 }
                 main.setScreen(previousScreen);
             }
