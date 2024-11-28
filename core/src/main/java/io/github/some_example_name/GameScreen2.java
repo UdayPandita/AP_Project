@@ -103,7 +103,6 @@ public class GameScreen2 implements Screen {
         stage.addActor(table);
 
         table.top().right();
-        table.add(dummyButton).pad(10).width(80);
         table.add(pauseButton).pad(10).width(80);
 
         pauseButton.addListener(new ChangeListener() {
@@ -114,15 +113,7 @@ public class GameScreen2 implements Screen {
                 main.setScreen(main.pause);
             }
         });
-        dummyButton.addListener(new ChangeListener(){
-            public void changed(ChangeEvent event, Actor actor) {
-                Gdx.app.log("GameScreen", "Dummy button clicked");
-                main.wscreen.previousScreen = main.game2;
-                main.setScreen(main.wscreen);
 
-            }
-
-        });
     }
 
     @Override
@@ -236,21 +227,12 @@ public class GameScreen2 implements Screen {
             }
         });
 
-        dummyButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                Gdx.app.log("GameScreen", "Dummy button clicked");
-                main.lscreen.previousScreen = main.game1;
-                main.setScreen(main.lscreen);
-            }
-        });
 
         // Add buttons to the layout
         Table table = new Table();
         table.setFillParent(true);
         stage.addActor(table);
         table.top().right();
-        table.add(dummyButton).pad(10).width(80);
         table.add(pauseButton).pad(10).width(80);
 
         CircleShape birdShape = new CircleShape();
@@ -286,6 +268,7 @@ public class GameScreen2 implements Screen {
         Pig.add(chfpig);
         Pig.add(armpig);
         Pig.add(kngpig);
+
         PolygonShape steelblockShape = new PolygonShape();
         steelblockShape.setAsBox(18 / 100f, 18 / 100f); // S
         steelblock.body = createBody(world, BodyDef.BodyType.DynamicBody,

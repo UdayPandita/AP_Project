@@ -76,7 +76,8 @@ public class LevelScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.app.log("LevelScreen", "Level 1 button clicked");
-                main.setScreen(main.game1);
+
+                main.setScreen(new GameScreen1(main));
             }
         });
 
@@ -84,13 +85,16 @@ public class LevelScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.app.log("LevelScreen", "Level 2 button clicked");
-                main.setScreen(main.game2);
+                main.setScreen(new GameScreen2(main));
             }
         });
 
         level3Button.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+
+
+
                 Gdx.app.log("LevelScreen", "Level 3 button clicked");
                 main.setScreen(main.game3);
             }
@@ -99,6 +103,7 @@ public class LevelScreen implements Screen {
         mainMenuButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+
                 Gdx.app.log("LevelScreen", "Main Menu button clicked");
                 main.setScreen(main.menu);
             }
