@@ -36,6 +36,7 @@ public class LevelScreen implements Screen {
     private final float LEVEL2_Y = 180;
     private final float LEVEL3_Y = 80;
     private final float BACK_Y = 20;
+    private int flag = 0;
 
     public LevelScreen(final Main main) {
 
@@ -92,11 +93,13 @@ public class LevelScreen implements Screen {
         level3Button.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-
-
-
                 Gdx.app.log("LevelScreen", "Level 3 button clicked");
-                main.setScreen(main.game3);
+                if (flag == 0) {
+                    main.setScreen(main.game3);
+                }
+                else {
+                    main.setScreen(new GameScreen3(main));
+                }
             }
         });
 
