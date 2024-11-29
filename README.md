@@ -22,11 +22,15 @@ For running the project you will have to first build the project using gradle an
 
 -The play button will bring the user to level selection screen where he can select the levels (3 preesently).
 
--On selecting the desired level the screen for the respective level will be opened the user can no play at present due to being static GUI .
+-On selecting the desired level the screen for the respective level will be opened  .
 
--The user is provided the with dummy button and pause button for each level.
+-The user can play the game using his/her mouse drag for aiming the birds towards the pigs.
 
--On pressing the dummy button the user gets a preview of the envisioned winning screen .
+-The user is provided the pause button for each level.
+
+-On completing the level the user is moved to the winning screen .
+
+-If the user fails to pass the level the lose screen is displayed.
 
 -On pressing the pause button the user has options for restarting the level , saving the current game state , options button to acess the sound and load options and lastly a mainmenu button to go back to the main screen.
 
