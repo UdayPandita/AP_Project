@@ -71,7 +71,8 @@ class PauseMenu implements Screen {
                     previousScreen = new GameScreen2(main);
                 }
                 else if (previousScreen instanceof GameScreen3) {
-                    previousScreen = new GameScreen3(main);
+                    main.game3.False();
+                    previousScreen = main.game3;
                 }
                 main.setScreen(previousScreen);
             }
@@ -88,7 +89,8 @@ class PauseMenu implements Screen {
                     previousScreen = new GameScreen2(main);
                 }
                 else if (previousScreen instanceof GameScreen3) {
-                    previousScreen = new GameScreen3(main);
+                    main.game3.False();
+                    previousScreen = main.game3;
                 }
                 main.setScreen(previousScreen);
             }

@@ -95,6 +95,7 @@ public class LevelScreen implements Screen {
             public void changed(ChangeEvent event, Actor actor) {
                 Gdx.app.log("LevelScreen", "Level 3 button clicked");
                 if (flag == 0) {
+                    main.game3.False();
                     main.setScreen(main.game3);
                 }
                 else {
