@@ -36,7 +36,7 @@ For running the project you will have to first build the project using gradle an
 
 ## Contributions
 
-`Uday(2023563)` - Managed all the assets, created the classes such as Birds, Pigs and Elements which are used in game screens, implemented all the game screens and the win screen,implemented the camera and resising for the levels.
+`Uday(2023563)` - Managed all the assets, created the classes such as Birds, Pigs and Elements which are used in game screens, implemented all the game screens and the win screen,implemented the camera and resizing for the levels.
 
 `Prateek(2023388)` - Managed all the button and screen functionalities, created all other screens and connected them, also managed the camera to make resizing work well without stretching.
 
