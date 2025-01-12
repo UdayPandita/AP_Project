@@ -8,7 +8,7 @@ To launch the game you have to first bulid the project using gradle and then lau
 
 ## Setup
 
-For setting up the project extract the zip file and download all the necesssary code files and setup on and java ide supporting libgdx library(like IntellijIdea).
+For setting up the project extract the zip file and download all the necesssary code files and setup on any java IDE supporting libgdx library(like IntellijIdea).
 
 ## Run
 
@@ -18,9 +18,9 @@ For running the project you will have to first build the project using gradle an
 
 -On running the project the main screen for the game will be opened providing one with two option the play button and option button .
 
--The option button provides the user with services to switch the sound according to his requirement and the load save service through which the user can access his previous saved game level.
+-The option button provides the user with services to switch the sound according to his requirement and with the load save service through which the user can access his previous saved game level.
 
--The play button will bring the user to level selection screen where he can select the levels (3 preesently).
+-The play button will bring the user to level selection screen where he can select the levels (presently 3).
 
 -On selecting the desired level the screen for the respective level will be opened  .
 
